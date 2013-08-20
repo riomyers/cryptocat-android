@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Cryptocat</string>
+    <string name="ticker_text">Cryptocat is connected</string>
+    <string name="title_conversation_detail">Conversation Detail</string>
+    <string name="send">Send</string>
+    <string name="saysomething">Say something :3</string>
+
+</resources>

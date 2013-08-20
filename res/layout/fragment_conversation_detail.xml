@@ -1,0 +1,35 @@
+<LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListView
+            android:id="@+id/conversation" android:layout_width="fill_parent"
+            android:layout_height="fill_parent" android:textIsSelectable="true"
+            android:layout_weight="1.0" android:focusable="false" android:focusableInTouchMode="false"
+            android:autoLink="email|web" android:linksClickable="true" android:stackFromBottom="true"
+            style="@style/Conversation"
+            android:dividerHeight="0dp"
+            android:divider="@null"/>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" android:layout_gravity="fill_horizontal"
+            >
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text=""
+                android:hint="@string/saysomething"
+                android:id="@+id/text" android:phoneNumber="false" android:password="false"
+                android:layout_gravity="bottom|left|right|top">
+            <requestFocus/>
+        </EditText>
+        <Button
+                android:layout_width="80dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.0"
+                android:text="@string/send"
+                android:id="@+id/send"/>
+    </LinearLayout>
+</LinearLayout>
