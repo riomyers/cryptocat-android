@@ -122,7 +122,7 @@ public class BoundFragment extends Fragment
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(String server, String conversation);
+		public void onItemSelected(String server, String conversation, String buddy);
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class BoundFragment extends Fragment
 	private static Callbacks sDummyCallbacks = new Callbacks()
 	{
 		@Override
-		public void onItemSelected(String server, String conversation)
+		public void onItemSelected(String server, String conversation, String buddy)
 		{
 		}
 	};

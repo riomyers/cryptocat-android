@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.dirbaio.cryptocat;
+package net.dirbaio.cryptocat.protocol;
 
 import android.os.Build;
 import org.jivesoftware.smack.*;
@@ -17,7 +17,7 @@ public class CryptocatServer
 	public final String server, conferenceServer;
 	public final int port;
 
-	private final HashMap<String, CryptocatConversation> conversations = new HashMap<>();
+	public final HashMap<String, MultipartyConversation> conversations = new HashMap<>();
 	private final ArrayList<CryptocatStateListener> listeners = new ArrayList<>();
 
 	private String username, password;
@@ -150,7 +150,7 @@ public class CryptocatServer
 			throw new IllegalStateException("You're not connected to this server.");
 
 		//Leave all conversations
-		for (CryptocatConversation c : conversations.values())
+		for (MultipartyConversation c : conversations.values())
 			c.leave();
 
 		con.disconnect();
@@ -178,32 +178,26 @@ public class CryptocatServer
 			l.stateChanged();
 	}
 
-	public CryptocatConversation createConversation(String name, String nickname) throws XMPPException
+	public MultipartyConversation createConversation(String name, String nickname) throws XMPPException
 	{
-		CryptocatConversation cc = new CryptocatConversation(this, name, nickname);
+		MultipartyConversation cc = new MultipartyConversation(this, name, nickname);
 		conversations.put(cc.id, cc);
 
 		notifyStateChanged();
 		return cc;
 	}
 
-	public CryptocatConversation getConversation(String id)
+	public MultipartyConversation getConversation(String id)
 	{
 		return conversations.get(id);
 	}
 
 	public void removeConversation(String id)
 	{
-		if (getConversation(id).getState() != CryptocatConversation.State.NotJoined)
+		if (getConversation(id).getState() != MultipartyConversation.State.NotJoined)
 			throw new IllegalStateException("Conversation must be disconnected");
 
 		conversations.remove(id);
-	}
-
-	public void getConversationList(ArrayList<Object> list)
-	{
-		for (CryptocatConversation c : conversations.values())
-			list.add(c);
 	}
 
 	@Override

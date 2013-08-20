@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.dirbaio.cryptocat;
+package net.dirbaio.cryptocat.protocol;
 
 import org.jivesoftware.smack.util.Base64;
 

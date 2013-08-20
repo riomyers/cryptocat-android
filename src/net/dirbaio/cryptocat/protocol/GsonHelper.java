@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat;
+package net.dirbaio.cryptocat.protocol;
 
 import com.google.gson.*;
 

@@ -29,6 +29,8 @@ public class MainActivity extends SlidingFragmentActivity
 
 	public static final String ARG_SERVER_ID = "net.dirbaio.cryptocat.SERVER_ID";
 	public static final String ARG_CONVERSATION_ID = "net.dirbaio.cryptocat.CONVERSATION_ID";
+	public static final String ARG_BUDDY_ID = "net.dirbaio.cryptocat.BUDDY_ID";
+
 	private ConversationListFragment conversationList;
 
 	@Override
@@ -63,7 +65,7 @@ public class MainActivity extends SlidingFragmentActivity
 		sm.setSecondaryMenu(R.layout.frame_buddy_list);
 
 		//All done, now set contents on these!
-		onItemSelected(null, null);
+		onItemSelected(null, null, null);
 		setConversationListFragment(new ConversationListFragment());
 
 		//TODO Move this to ConversationListFragment since it's always true.
@@ -101,7 +103,7 @@ public class MainActivity extends SlidingFragmentActivity
 	 * indicating that the item with the given ID was selected.
 	 */
 	@Override
-	public void onItemSelected(String server, String conversation)
+	public void onItemSelected(String server, String conversation, String buddy)
 	{
 		// In two-pane mode, show the detail view in this activity by
 		// adding or replacing the detail fragment using a
@@ -109,13 +111,15 @@ public class MainActivity extends SlidingFragmentActivity
 		Bundle arguments = new Bundle();
 		arguments.putString(ARG_SERVER_ID, server);
 		arguments.putString(ARG_CONVERSATION_ID, conversation);
+		arguments.putString(ARG_BUDDY_ID, buddy);
 		Fragment fragment, fragment2;
 
 		if (server != null && conversation != null)
 		{
 			fragment = new ConversationDetailFragment();
 			fragment2 = new BuddyListFragment();
-		} else
+		}
+		else
 		{
 			fragment2 = new CreditsFragment();
 			if (server != null)

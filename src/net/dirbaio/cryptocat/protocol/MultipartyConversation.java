@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat;
+package net.dirbaio.cryptocat.protocol;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.*;
 import java.util.*;
 
-public class CryptocatConversation
+public class MultipartyConversation extends Conversation
 {
 
 	public static final String PUBLIC_KEY = "publicKey";
@@ -24,39 +24,20 @@ public class CryptocatConversation
 	public static final String MESSAGE = "message";
 
 	MultiUserChat muc;
-	final CryptocatServer server;
-	final String nickname;
 	final String name;
-	final String id;
+
 	public byte[] privateKey;
 	public byte[] publicKey;
 	public final Map<String, Buddy> buddiesByName = new HashMap<>();
 	public final ArrayList<Buddy> buddies = new ArrayList<>();
-	private final ArrayList<CryptocatMessageListener> msgListeners = new ArrayList<>();
+	public final HashMap<String, OtrConversation> privateConversations = new HashMap<>();
+	private final HashMap<String, OtrConversation> privateConversationsByNick = new HashMap<>();
 	private final ArrayList<CryptocatBuddyListener> buddyListeners = new ArrayList<>();
-	public final ArrayList<CryptocatMessage> history = new ArrayList<>();
 
-	private State state;
-
-	public enum State
+	public MultipartyConversation(CryptocatServer server, String name, String nickname) throws XMPPException
 	{
-		NotJoined,
-		Joined,
-	}
-
-	public CryptocatConversation(CryptocatServer server, String name, String nickname) throws XMPPException
-	{
-		this.server = server;
+		super(server, nickname);
 		this.name = name;
-		this.nickname = nickname;
-		this.state = State.NotJoined;
-
-		this.id = nickname + "@" + name;
-	}
-
-	public State getState()
-	{
-		return state;
 	}
 
 	public void join() throws XMPPException
@@ -156,16 +137,6 @@ public class CryptocatConversation
 		server.notifyStateChanged();
 	}
 
-	public void addMessageListener(CryptocatMessageListener l)
-	{
-		msgListeners.add(l);
-	}
-
-	public void removeMessageListener(CryptocatMessageListener l)
-	{
-		msgListeners.remove(l);
-	}
-
 	public void addBuddyListener(CryptocatBuddyListener l)
 	{
 		buddyListeners.add(l);
@@ -176,6 +147,38 @@ public class CryptocatConversation
 		buddyListeners.remove(l);
 	}
 
+	public OtrConversation startPrivateConversation(String buddyNickname) throws XMPPException
+	{
+		if (state != State.Joined)
+			throw new IllegalStateException("You're not joined to the chatroom.");
+		if (server.getState() == CryptocatServer.State.Disconnected)
+			throw new IllegalStateException("Server is not connected");
+
+		//Don't create the conversation again.
+		OtrConversation conv = privateConversationsByNick.get(buddyNickname);
+		if(conv != null)
+			return conv;
+
+		conv = new OtrConversation(this, buddyNickname);
+		privateConversations.put(conv.id, conv);
+		privateConversationsByNick.put(buddyNickname, conv);
+
+		conv.join();
+
+		server.notifyStateChanged();
+		return conv;
+	}
+
+	public OtrConversation getPrivateConversation(String id)
+	{
+		return privateConversations.get(id);
+	}
+
+	@Override
+	public String toString()
+	{
+		return "[" + state + "] " + name;
+	}
 
 	private void sendJsonMessage(JsonMessage m) throws XMPPException
 	{
@@ -304,13 +307,6 @@ public class CryptocatConversation
 		}
 	}
 
-	private void addMessage(CryptocatMessage msg)
-	{
-		for (CryptocatMessageListener l : msgListeners)
-			l.messageReceived(msg);
-
-		history.add(msg);
-	}
 
 	private void notifyBuddyListChange()
 	{
@@ -398,18 +394,13 @@ public class CryptocatConversation
 		addMessage(msg);
 	}
 
-	@Override
-	public String toString()
-	{
-		return "[" + state + "] " + id;
-	}
 
 	public class Buddy
 	{
 
-		private String nickname;
-		private byte[] publicKey;
-		private byte[] messageSecret, hmacSecret;
+		public final String nickname;
+		private final byte[] publicKey;
+		private final byte[] messageSecret, hmacSecret;
 
 		private Buddy(String nickname, byte[] publicKey) throws InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchProviderException
 		{

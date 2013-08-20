@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.os.*;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
+import net.dirbaio.cryptocat.protocol.CryptocatServer;
+import net.dirbaio.cryptocat.protocol.CryptocatStateListener;
+import net.dirbaio.cryptocat.protocol.MultipartyConversation;
+import net.dirbaio.cryptocat.protocol.OtrConversation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -136,7 +140,12 @@ public class CryptocatService extends Service implements CryptocatStateListener
 		for (CryptocatServer s : servers.values())
 		{
 			list.add(s);
-			s.getConversationList(list);
+			for (MultipartyConversation c : s.conversations.values())
+			{
+				list.add(c);
+				for(OtrConversation o : c.privateConversations.values())
+					list.add(o);
+			}
 		}
 	}
 

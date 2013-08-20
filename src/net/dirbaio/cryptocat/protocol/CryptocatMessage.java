@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat;
+package net.dirbaio.cryptocat.protocol;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,9 +9,9 @@ package net.dirbaio.cryptocat;
  */
 public class CryptocatMessage
 {
-	final Type t;
-	final String nickname;
-	final String text;
+	public final Type t;
+	public final String nickname;
+	public final String text;
 
 	public CryptocatMessage(String nickname, Type t)
 	{

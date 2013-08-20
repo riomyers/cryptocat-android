@@ -8,6 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import net.dirbaio.cryptocat.protocol.MultipartyConversation;
+import net.dirbaio.cryptocat.protocol.CryptocatServer;
+import net.dirbaio.cryptocat.protocol.CryptocatStateListener;
+import net.dirbaio.cryptocat.protocol.OtrConversation;
 
 import java.util.ArrayList;
 
@@ -96,14 +100,20 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
 		Object o = conversations.get(position);
-		if (o instanceof CryptocatConversation)
+		if (o instanceof OtrConversation)
 		{
-			CryptocatConversation conv = (CryptocatConversation) o;
-			callbacks.onItemSelected(conv.server.id, conv.id);
-		} else if (o instanceof CryptocatServer)
+			OtrConversation conv = (OtrConversation) o;
+			callbacks.onItemSelected(conv.server.id, conv.parent.id, conv.id);
+		}
+		else if (o instanceof MultipartyConversation)
+		{
+			MultipartyConversation conv = (MultipartyConversation) o;
+			callbacks.onItemSelected(conv.server.id, conv.id, null);
+		}
+		else if (o instanceof CryptocatServer)
 		{
 			CryptocatServer srv = (CryptocatServer) o;
-			callbacks.onItemSelected(srv.id, null);
+			callbacks.onItemSelected(srv.id, null, null);
 		}
 	}
 

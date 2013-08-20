@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import net.dirbaio.cryptocat.protocol.CryptocatServer;
 
 public class JoinServerFragment extends BoundFragment
 {

@@ -6,20 +6,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import net.dirbaio.cryptocat.protocol.Conversation;
+import net.dirbaio.cryptocat.protocol.MultipartyConversation;
+import net.dirbaio.cryptocat.protocol.CryptocatMessage;
+import net.dirbaio.cryptocat.protocol.CryptocatMessageListener;
 
 import java.util.ArrayList;
 
 /**
- * A fragment representing a single Conversation detail screen.
- * This fragment is either contained in a {@link MainActivity}
- * in two-pane mode (on tablets) or a {@link ConversationDetailActivity}
- * on handsets.
+ * A fragment representing a single Conversation screen.
+ * This fragment is contained in a {@link MainActivity}
  */
 public class ConversationDetailFragment extends BoundFragment implements CryptocatMessageListener
 {
 	private String serverId;
 	private String conversationId;
-	private CryptocatConversation conversation;
+	private String buddyId;
+	private Conversation conversation;
 
 	private ArrayAdapter<CryptocatMessage> conversationArrayAdapter;
 	private ListView conversationView;
@@ -40,6 +43,7 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 
 		serverId = getArguments().getString(MainActivity.ARG_SERVER_ID);
 		conversationId = getArguments().getString(MainActivity.ARG_CONVERSATION_ID);
+		buddyId = getArguments().getString(MainActivity.ARG_BUDDY_ID);
 	}
 
 	@Override
@@ -53,6 +57,10 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	protected void onServiceBind()
 	{
 		conversation = service.getServer(serverId).getConversation(conversationId);
+		if(buddyId != null)
+			conversation = ((MultipartyConversation)conversation).getPrivateConversation(buddyId);
+
+		System.err.println(serverId+", "+conversationId+", "+buddyId+", "+conversation);
 		conversationArrayAdapter = new ConversationAdapter(getActivity(), R.layout.item_message, conversation.history);
 		conversationView.setAdapter(conversationArrayAdapter);
 
@@ -78,7 +86,6 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 			}
 		});
 	}
-
 
 	@Override
 	public void messageReceived(final CryptocatMessage message)
