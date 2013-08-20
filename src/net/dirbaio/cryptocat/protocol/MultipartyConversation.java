@@ -183,7 +183,6 @@ public class MultipartyConversation extends Conversation
 	private void sendJsonMessage(JsonMessage m) throws XMPPException
 	{
 		String send = GsonHelper.customGson.toJson(m);
-		send = send.replace("\"", "&quot;");
 		muc.sendMessage(send);
 	}
 
@@ -202,9 +201,6 @@ public class MultipartyConversation extends Conversation
 	{
 		if (from.equals(nickname))
 			return;
-
-		//Decode quotes (wtf)
-		body = body.replace("&quot;", "\"");
 
 		//Decode JSON
 		JsonMessage m;
