@@ -43,3 +43,18 @@ Known bugs (they will get fixed!)
 * Reconnection doesn't work
 * Sometimes you get randomly disconnected and the app fails to see it
 * No way to close the service (It should close when you disconnect from all servers)
+
+How to build
+---
+
+It's an IntelliJ IDEA project. Not sure how much luck you will have using it with other IDEs. (I tried to make it as a Maven project but failed miserably. Help on that would be highly welcome)
+
+It requires a few libs:
+* [ActionBarSherlock](http://actionbarsherlock.com)
+* [SlidingMenu](https://github.com/jfeinstein10/SlidingMenu)
+* [aSmack](https://github.com/flowdalic/asmack)
+* [Google Gson](https://code.google.com/p/google-gson/)
+* Android Support v4
+
+If you include these libs as modules and then add them as dependancies on the Cryptocat module everything should build fine.
+
