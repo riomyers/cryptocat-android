@@ -17,9 +17,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="gson-2.2.4" level="project" />
     <orderEntry type="library" name="asmack-android-18" level="project" />
+    <orderEntry type="library" name="android-support-v42" level="project" />
     <orderEntry type="module" module-name="ActionBarSherlock" />
     <orderEntry type="module" module-name="SlidingMenu" />
-    <orderEntry type="library" name="android-support-v42" level="project" />
   </component>
 </module>
 

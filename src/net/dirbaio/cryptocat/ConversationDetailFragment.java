@@ -6,10 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import net.dirbaio.cryptocat.protocol.Conversation;
-import net.dirbaio.cryptocat.protocol.MultipartyConversation;
-import net.dirbaio.cryptocat.protocol.CryptocatMessage;
-import net.dirbaio.cryptocat.protocol.CryptocatMessageListener;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import net.dirbaio.cryptocat.protocol.*;
 
 import java.util.ArrayList;
 
@@ -17,7 +16,7 @@ import java.util.ArrayList;
  * A fragment representing a single Conversation screen.
  * This fragment is contained in a {@link MainActivity}
  */
-public class ConversationDetailFragment extends BoundFragment implements CryptocatMessageListener
+public class ConversationDetailFragment extends BoundFragment implements CryptocatMessageListener, CryptocatBuddyListener
 {
 	private String serverId;
 	private String conversationId;
@@ -50,7 +49,33 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	public void onStart()
 	{
 		super.onStart();
-		getActivity().getActionBar().setTitle(conversationId);
+	}
+
+	private void updateTitle()
+	{
+
+
+		if(conversation instanceof MultipartyConversation)
+		{
+			MultipartyConversation mp = (MultipartyConversation) conversation;
+
+			String subtitle = "";
+			for(MultipartyConversation.Buddy b : mp.buddies)
+				if(!subtitle.isEmpty())
+				{
+					subtitle += ", ";
+					subtitle += b.nickname;
+				}
+			((SherlockFragmentActivity)getActivity()).getSupportActionBar().setTitle(mp.roomName);
+			((SherlockFragmentActivity)getActivity()).getSupportActionBar().setSubtitle(subtitle);
+		}
+		else if(conversation instanceof OtrConversation)
+		{
+			OtrConversation priv = (OtrConversation) conversation;
+
+			((SherlockFragmentActivity)getActivity()).getSupportActionBar().setTitle(priv.parent.roomName);
+			((SherlockFragmentActivity)getActivity()).getSupportActionBar().setSubtitle(priv.buddyNickname);
+		}
 	}
 
 	@Override
@@ -70,8 +95,12 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 			public void run()
 			{
 				conversation.addMessageListener(ConversationDetailFragment.this);
+				if(conversation instanceof MultipartyConversation)
+					((MultipartyConversation)conversation).addBuddyListener(ConversationDetailFragment.this);
 			}
 		});
+
+		updateTitle();
 	}
 
 	@Override
@@ -136,6 +165,11 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 		return rootView;
 	}
 
+	@Override
+	public void buddyListChanged()
+	{
+		updateTitle();
+	}
 
 	private class ConversationAdapter extends ArrayAdapter<CryptocatMessage>
 	{

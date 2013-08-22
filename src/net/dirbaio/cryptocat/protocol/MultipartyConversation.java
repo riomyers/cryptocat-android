@@ -24,7 +24,7 @@ public class MultipartyConversation extends Conversation
 	public static final String MESSAGE = "message";
 
 	MultiUserChat muc;
-	final String name;
+	public final String roomName;
 
 	public byte[] privateKey;
 	public byte[] publicKey;
@@ -34,10 +34,10 @@ public class MultipartyConversation extends Conversation
 	private final HashMap<String, OtrConversation> privateConversationsByNick = new HashMap<>();
 	private final ArrayList<CryptocatBuddyListener> buddyListeners = new ArrayList<>();
 
-	public MultipartyConversation(CryptocatServer server, String name, String nickname) throws XMPPException
+	public MultipartyConversation(CryptocatServer server, String roomName, String nickname) throws XMPPException
 	{
 		super(server, nickname);
-		this.name = name;
+		this.roomName = roomName;
 	}
 
 	public void join() throws XMPPException
@@ -57,7 +57,7 @@ public class MultipartyConversation extends Conversation
 		Curve25519.keygen(publicKey, null, privateKey);
 
 		//Setup MUC chat
-		muc = new MultiUserChat(server.con, name + "@" + server.conferenceServer);
+		muc = new MultiUserChat(server.con, roomName + "@" + server.conferenceServer);
 
 		muc.addMessageListener(new PacketListener()
 		{
@@ -74,7 +74,6 @@ public class MultipartyConversation extends Conversation
 				} catch (Exception e)
 				{
 					e.printStackTrace();
-					System.exit(1);
 				}
 			}
 		});
@@ -106,7 +105,6 @@ public class MultipartyConversation extends Conversation
 				} catch (Exception e)
 				{
 					e.printStackTrace();
-					System.exit(1);
 				}
 			}
 		});
@@ -177,7 +175,7 @@ public class MultipartyConversation extends Conversation
 	@Override
 	public String toString()
 	{
-		return "[" + state + "] " + name;
+		return "[" + state + "] " + roomName;
 	}
 
 	private void sendJsonMessage(JsonMessage m) throws XMPPException

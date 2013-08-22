@@ -10,7 +10,6 @@ import net.dirbaio.cryptocat.protocol.MultipartyConversation;
 import net.dirbaio.cryptocat.protocol.CryptocatServer;
 import net.dirbaio.cryptocat.protocol.CryptocatStateListener;
 
-
 public class ServerDetailFragment extends BoundFragment implements CryptocatStateListener
 {
 
@@ -52,7 +51,7 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 		rootView = inflater.inflate(R.layout.fragment_server_detail, container, false);
 
 		final Button button = (Button) rootView.findViewById(R.id.button);
-		final EditText roomNameText = (EditText) rootView.findViewById(R.id.roomName);
+		final EditText roomNameText = (EditText) rootView.findViewById(R.id.name);
 		final EditText nicknameText = (EditText) rootView.findViewById(R.id.nickname);
 
 		button.setOnClickListener(new View.OnClickListener()

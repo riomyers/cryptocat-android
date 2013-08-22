@@ -38,7 +38,7 @@ public class OtrConversation extends Conversation implements MessageListener
 		if (parent.getState() == State.NotJoined)
 			throw new IllegalStateException("You haven't joined the chatroom");
 
-		chat = parent.muc.createPrivateChat(parent.name+"@"+parent.server.conferenceServer+"/"+buddyNickname, this);
+		chat = parent.muc.createPrivateChat(parent.roomName +"@"+parent.server.conferenceServer+"/"+buddyNickname, this);
 
 		state = State.Joined;
 		server.notifyStateChanged();
@@ -80,7 +80,7 @@ public class OtrConversation extends Conversation implements MessageListener
 	@Override
 	public String toString()
 	{
-		return "[" + state + "] " + parent.name+":"+buddyNickname;
+		return "[" + state + "] " + parent.roomName +":"+buddyNickname;
 	}
 
 }

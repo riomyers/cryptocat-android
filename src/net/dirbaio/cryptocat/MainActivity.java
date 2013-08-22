@@ -4,26 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
-/**
- * An activity representing a list of Conversations. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link ConversationDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- * <p/>
- * The activity makes heavy use of fragments. The list of items is a
- * {@link ConversationListFragment} and the item details
- * (if present) is a {@link ConversationDetailFragment}.
- * <p/>
- * This activity also implements the required
- * {@link ConversationListFragment.Callbacks} interface
- * to listen for item selections.
- */
-public class MainActivity extends SlidingFragmentActivity
+public class MainActivity extends SherlockFragmentActivity
 		implements ConversationListFragment.Callbacks
 {
 
@@ -31,7 +15,7 @@ public class MainActivity extends SlidingFragmentActivity
 	public static final String ARG_CONVERSATION_ID = "net.dirbaio.cryptocat.CONVERSATION_ID";
 	public static final String ARG_BUDDY_ID = "net.dirbaio.cryptocat.BUDDY_ID";
 
-	private ConversationListFragment conversationList;
+	private SlidingMenu sm;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -48,26 +32,31 @@ public class MainActivity extends SlidingFragmentActivity
 		setContentView(R.layout.frame_conversation_detail);
 
 		// customize the SlidingMenu
-		SlidingMenu sm = getSlidingMenu();
+		sm = new SlidingMenu(this);
+
 		sm.setShadowWidthRes(R.dimen.shadow_width);
 		sm.setShadowDrawable(R.drawable.shadow);
 		sm.setSecondaryShadowDrawable(R.drawable.shadowright);
 		sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		sm.setFadeDegree(0.35f);
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		getSlidingMenu().setMode(SlidingMenu.LEFT_RIGHT);
-		setSlidingActionBarEnabled(false);
+		sm.setMode(SlidingMenu.LEFT_RIGHT);
+
+		sm.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 
 		//SlidingMenu left view (conversation list)
-		setBehindContentView(R.layout.frame_conversation_list);
+		sm.setMenu(R.layout.frame_conversation_list);
 
 		//SlidingMenu right view (user list)
 		sm.setSecondaryMenu(R.layout.frame_buddy_list);
+
 
 		//All done, now set contents on these!
 		onItemSelected(null, null, null);
 		setConversationListFragment(new ConversationListFragment());
 
+		getSupportActionBar().setSubtitle("Hello world!");
+		getSupportActionBar().setTitle("Cryptocat!");
 		//TODO Move this to ConversationListFragment since it's always true.
 		//FIXME PLS
 		//conversationList.setActivateOnItemClick(true);
@@ -78,7 +67,6 @@ public class MainActivity extends SlidingFragmentActivity
 	private void setFragment(int id, Fragment fragment)
 	{
 		FragmentTransaction t = this.getSupportFragmentManager().beginTransaction();
-		conversationList = new ConversationListFragment();
 		t.replace(id, fragment);
 		t.commit();
 	}
@@ -133,6 +121,6 @@ public class MainActivity extends SlidingFragmentActivity
 		fragment2.setArguments(arguments);
 		setBuddyListFragment(fragment2);
 
-		getSlidingMenu().showContent();
+		sm.showContent();
 	}
 }
