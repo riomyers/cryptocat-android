@@ -34,7 +34,7 @@
                 android:value=".ConversationListActivity" />
         </activity>
 
-        <service android:name=".CryptocatService"/>
+        <service android:name=".protocol.CryptocatService"/>
     </application>
 
 </manifest>

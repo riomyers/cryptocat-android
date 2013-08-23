@@ -80,15 +80,8 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	@Override
 	public void stateChanged()
 	{
-		handler.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				service.getConversationList(conversations);
-				conversationArrayAdapter.notifyDataSetChanged();
-			}
-		});
+		service.getConversationList(conversations);
+		conversationArrayAdapter.notifyDataSetChanged();
 	}
 
 

@@ -1,5 +1,6 @@
 package net.dirbaio.cryptocat.protocol;
 
+import net.dirbaio.cryptocat.ExceptionRunnable;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
@@ -31,50 +32,93 @@ public class OtrConversation extends Conversation implements MessageListener
 	@Override
 	public void join() throws XMPPException
 	{
-		if (state == State.Joined)
+		if (state != State.Left)
 			throw new IllegalStateException("You're already joined.");
-		if (server.getState() == CryptocatServer.State.Disconnected)
+		if (server.getState() != CryptocatServer.State.Connected)
 			throw new IllegalStateException("Server is not connected");
-		if (parent.getState() == State.NotJoined)
+		if (parent.getState() != State.Joined)
 			throw new IllegalStateException("You haven't joined the chatroom");
 
-		chat = parent.muc.createPrivateChat(parent.roomName +"@"+parent.server.conferenceServer+"/"+buddyNickname, this);
+		state = State.Joining;
 
-		state = State.Joined;
-		server.notifyStateChanged();
+		CryptocatService.getInstance().post(new ExceptionRunnable()
+		{
+			@Override
+			public void run() throws Exception
+			{
+				try
+				{
+					server.notifyStateChanged();
+					chat = parent.muc.createPrivateChat(parent.roomName +"@"+parent.server.conferenceServer+"/"+buddyNickname, OtrConversation.this);
+
+					state = State.Joined;
+					server.notifyStateChanged();
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+
+					state = State.Error;
+					server.notifyStateChanged();
+				}
+			}
+		});
 	}
 
 	@Override
 	public void leave()
 	{
-		if (state == State.NotJoined)
+		if (state == State.Left)
 			throw new IllegalStateException("You have not joined.");
 
-		chat.removeMessageListener(this);
+		final Chat chatFinal = chat;
+		CryptocatService.getInstance().post(new ExceptionRunnable()
+		{
+			@Override
+			public void run() throws Exception
+			{
+				chatFinal.removeMessageListener(OtrConversation.this);
+			}
+		});
+
 		chat = null;
 
-		state = State.NotJoined;
+		state = State.Left;
 		server.notifyStateChanged();
 	}
 
 	//TODO Actual OTR implementation.
 	@Override
-	public void sendMessage(String msg) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException
+	public void sendMessage(final String msg) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException
 	{
 		//Check state
-		if (getState() == State.NotJoined)
+		if (getState() != State.Joined)
 			throw new IllegalStateException("You have not joined.");
 
-		chat.sendMessage(msg);
+		CryptocatService.getInstance().post(new ExceptionRunnable()
+		{
+			@Override
+			public void run() throws Exception
+			{
+				chat.sendMessage(msg);
+			}
+		});
 
 		addMessage(new CryptocatMessage(CryptocatMessage.Type.Message, nickname, msg));
 	}
 
 	@Override
-	public void processMessage(Chat chat, Message message)
+	public void processMessage(Chat chat, final Message message)
 	{
-		String txt = message.getBody();
-		addMessage(new CryptocatMessage(CryptocatMessage.Type.Message, buddyNickname, txt));
+		CryptocatService.getInstance().uiPost(new ExceptionRunnable()
+		{
+			@Override
+			public void run() throws Exception
+			{
+				String txt = message.getBody();
+				addMessage(new CryptocatMessage(CryptocatMessage.Type.Message, buddyNickname, txt));
+			}
+		});
 	}
 
 	@Override

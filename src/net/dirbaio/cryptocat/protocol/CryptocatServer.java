@@ -5,6 +5,7 @@
 package net.dirbaio.cryptocat.protocol;
 
 import android.os.Build;
+import net.dirbaio.cryptocat.ExceptionRunnable;
 import org.jivesoftware.smack.*;
 
 import java.io.File;
@@ -28,8 +29,10 @@ public class CryptocatServer
 	public enum State
 	{
 		Disconnected,
-		Connecting,
 		Connected,
+		Disconnecting,
+		Connecting,
+		Error,
 	}
 
 	public State getState()
@@ -46,114 +49,132 @@ public class CryptocatServer
 		this.state = State.Disconnected;
 	}
 
-	public void connect() throws XMPPException
+	public void connect()
 	{
-		if (state == State.Connected)
+		if (state != State.Disconnected)
 			throw new IllegalStateException("You're already connected to this server.");
 
-		try
+		state = State.Connecting;
+		notifyStateChanged();
+
+		//No idea wtf this is
+		SmackConfiguration.setLocalSocks5ProxyEnabled(false);
+
+		//Setup connection
+		final ConnectionConfiguration config = new ConnectionConfiguration(server, port);
+
+		//Android trust store shenaniagans
+		//This is still broken :(
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
-			//Done!
-			state = State.Connecting;
-			notifyStateChanged();
+			config.setTruststoreType("AndroidCAStore");
+			config.setTruststorePassword(null);
+			config.setTruststorePath(null);
+		}
+		else
+		{
+			config.setTruststoreType("BKS");
+			String path = System.getProperty("javax.net.ssl.trustStore");
+			if (path == null)
+				path = System.getProperty("java.home") + File.separator + "etc"
+						+ File.separator + "security" + File.separator
+						+ "cacerts.bks";
+			System.err.println("Trust path: " + path);
+			config.setTruststorePath(path);
+		}
 
-			//No idea wtf this is
-			SmackConfiguration.setLocalSocks5ProxyEnabled(false);
-
-			//Setup connection
-			ConnectionConfiguration config = new ConnectionConfiguration(server, port);
-
-			//Android trust store shenaniagans
-			//This is still broken :(
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+		CryptocatService.getInstance().post(new ExceptionRunnable()
+		{
+			@Override
+			public void run() throws Exception
 			{
-				config.setTruststoreType("AndroidCAStore");
-				config.setTruststorePassword(null);
-				config.setTruststorePath(null);
-			} else
-			{
-				config.setTruststoreType("BKS");
-				String path = System.getProperty("javax.net.ssl.trustStore");
-				if (path == null)
-					path = System.getProperty("java.home") + File.separator + "etc"
-							+ File.separator + "security" + File.separator
-							+ "cacerts.bks";
-				System.err.println("Trust path: " + path);
-				config.setTruststorePath(path);
-			}
-
-			// Connect to the server
-			con = new XMPPConnection(config);
-
-
-			con.connect();
-			con.addConnectionListener(new ConnectionListener()
-			{
-				@Override
-				public void connectionClosed()
+				try
 				{
-					//TODO dejoin conversations
-					state = State.Disconnected;
-					notifyStateChanged();
-				}
+					// Connect to the server
+					con = new XMPPConnection(config);
 
-				@Override
-				public void connectionClosedOnError(Exception e)
-				{
-					//TODO dejoin conversations
-					state = State.Disconnected;
-					notifyStateChanged();
-				}
+					con.connect();
+					con.addConnectionListener(new ConnectionListener()
+					{
+						@Override
+						public void connectionClosed()
+						{
+							//TODO dejoin conversations
+							state = State.Disconnected;
+							notifyStateChanged();
+						}
 
-				@Override
-				public void reconnectingIn(int seconds)
-				{
-				}
+						@Override
+						public void connectionClosedOnError(Exception e)
+						{
+							//TODO dejoin conversations
+							state = State.Error;
+							notifyStateChanged();
+						}
 
-				@Override
-				public void reconnectionSuccessful()
-				{
+						@Override
+						public void reconnectingIn(int seconds)
+						{
+						}
+
+						@Override
+						public void reconnectionSuccessful()
+						{
+							state = State.Connected;
+							notifyStateChanged();
+						}
+
+						@Override
+						public void reconnectionFailed(Exception e)
+						{
+						}
+					});
+
+
+					//Register
+					username = Utils.randomString();
+					password = Utils.randomString();
+					AccountManager man = new AccountManager(con);
+					man.createAccount(username, password);
+
+					//Login
+					con.login(username, password);
+
+					//Done!
 					state = State.Connected;
 					notifyStateChanged();
 				}
-
-				@Override
-				public void reconnectionFailed(Exception e)
+				catch (XMPPException e)
 				{
+					e.printStackTrace();
+
+					state = State.Error;
+					notifyStateChanged();
 				}
-			});
-
-
-			//Register
-			username = Utils.randomString();
-			password = Utils.randomString();
-			AccountManager man = new AccountManager(con);
-			man.createAccount(username, password);
-
-			//Login
-			con.login(username, password);
-
-			//Done!
-			state = State.Connected;
-			notifyStateChanged();
-		} catch (XMPPException e)
-		{
-			state = State.Disconnected;
-			notifyStateChanged();
-			throw e;
-		}
+			}
+		});
 	}
 
 	public void disconnect()
 	{
-		if (state == State.Disconnected)
+		if (state != State.Connected)
 			throw new IllegalStateException("You're not connected to this server.");
 
 		//Leave all conversations
 		for (MultipartyConversation c : conversations.values())
 			c.leave();
 
-		con.disconnect();
+		final Connection con2 = con;
+
+		CryptocatService.getInstance().post(new ExceptionRunnable()
+		{
+			@Override
+			public void run() throws Exception
+			{
+				con2.disconnect();
+			}
+		});
+
 		con = null;
 		username = null;
 		password = null;
@@ -174,8 +195,15 @@ public class CryptocatServer
 
 	void notifyStateChanged()
 	{
-		for (CryptocatStateListener l : listeners)
-			l.stateChanged();
+		CryptocatService.getInstance().uiPost(new ExceptionRunnable()
+		{
+			@Override
+			public void run() throws Exception
+			{
+				for (CryptocatStateListener l : listeners)
+					l.stateChanged();
+			}
+		});
 	}
 
 	public MultipartyConversation createConversation(String name, String nickname) throws XMPPException
@@ -194,7 +222,7 @@ public class CryptocatServer
 
 	public void removeConversation(String id)
 	{
-		if (getConversation(id).getState() != MultipartyConversation.State.NotJoined)
+		if (getConversation(id).getState() != MultipartyConversation.State.Left)
 			throw new IllegalStateException("Conversation must be disconnected");
 
 		conversations.remove(id);

@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat;
+package net.dirbaio.cryptocat.protocol;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -7,10 +7,9 @@ import android.content.Intent;
 import android.os.*;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
-import net.dirbaio.cryptocat.protocol.CryptocatServer;
-import net.dirbaio.cryptocat.protocol.CryptocatStateListener;
-import net.dirbaio.cryptocat.protocol.MultipartyConversation;
-import net.dirbaio.cryptocat.protocol.OtrConversation;
+import net.dirbaio.cryptocat.ExceptionRunnable;
+import net.dirbaio.cryptocat.MainActivity;
+import net.dirbaio.cryptocat.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,11 +20,17 @@ import java.util.HashMap;
 public class CryptocatService extends Service implements CryptocatStateListener
 {
 
+	private static CryptocatService instance;
+
+	public static CryptocatService getInstance()
+	{
+		return instance;
+	}
+
 	private Looper serviceLooper;
 	private Handler serviceHandler;
-
+	private Handler uiHandler;
 	private final HashMap<String, CryptocatServer> servers = new HashMap<>();
-
 	private final ArrayList<CryptocatStateListener> listeners = new ArrayList<>();
 
 	// Binder given to clients
@@ -37,7 +42,7 @@ public class CryptocatService extends Service implements CryptocatStateListener
 	 */
 	public class CryptocatBinder extends Binder
 	{
-		CryptocatService getService()
+		public CryptocatService getService()
 		{
 			// Return this instance of LocalService so clients can call public methods
 			return CryptocatService.this;
@@ -65,6 +70,8 @@ public class CryptocatService extends Service implements CryptocatStateListener
 	@Override
 	public void onCreate()
 	{
+		instance = this;
+
 		HandlerThread thread = new HandlerThread("ServiceStartArguments",
 				Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
@@ -72,24 +79,20 @@ public class CryptocatService extends Service implements CryptocatStateListener
 		// Get the HandlerThread's Looper and use it for our Handler
 		serviceLooper = thread.getLooper();
 		serviceHandler = new Handler(serviceLooper);
-/*
-		post(new ExceptionRunnable()
-		{
-			@Override
-			public void run() throws Exception
-			{
-				CryptocatServer server = new CryptocatServer("crypto.cat", "conference.crypto.cat", 5222);
-				addServer(server);
-				server.connect();
-				server.createConversation("androidtest", "android").join();
-			}
-		});*/
+
+		// Create a handler to run stuff on the UI thread.
+		uiHandler = new Handler();
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		instance = null;
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-
 		Intent notificationIntent = new Intent(this, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
@@ -149,7 +152,7 @@ public class CryptocatService extends Service implements CryptocatStateListener
 		}
 	}
 
-	public void post(final ExceptionRunnable r)
+	void post(final ExceptionRunnable r)
 	{
 		serviceHandler.post(new Runnable()
 		{
@@ -167,9 +170,46 @@ public class CryptocatService extends Service implements CryptocatStateListener
 		});
 	}
 
-	public void post(final Runnable r)
+	void post(final Runnable r)
 	{
 		serviceHandler.post(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					r.run();
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+
+	void uiPost(final ExceptionRunnable r)
+	{
+		uiHandler.post(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					r.run();
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	void uiPost(final Runnable r)
+	{
+		uiHandler.post(new Runnable()
 		{
 			@Override
 			public void run()

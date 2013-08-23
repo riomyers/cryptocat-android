@@ -1,5 +1,6 @@
 package net.dirbaio.cryptocat.protocol;
 
+import net.dirbaio.cryptocat.ExceptionRunnable;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
@@ -30,7 +31,8 @@ public class MultipartyConversation extends Conversation
 	public byte[] publicKey;
 	public final Map<String, Buddy> buddiesByName = new HashMap<>();
 	public final ArrayList<Buddy> buddies = new ArrayList<>();
-	public final HashMap<String, OtrConversation> privateConversations = new HashMap<>();
+	public final Map<String, OtrConversation> privateConversations = new HashMap<>();
+
 	private final HashMap<String, OtrConversation> privateConversationsByNick = new HashMap<>();
 	private final ArrayList<CryptocatBuddyListener> buddyListeners = new ArrayList<>();
 
@@ -42,10 +44,13 @@ public class MultipartyConversation extends Conversation
 
 	public void join() throws XMPPException
 	{
-		if (state == State.Joined)
+		if (state != State.Left)
 			throw new IllegalStateException("You're already joined.");
-		if (server.getState() == CryptocatServer.State.Disconnected)
+		if (server.getState() != CryptocatServer.State.Connected)
 			throw new IllegalStateException("Server is not connected");
+
+		state = State.Joining;
+		server.notifyStateChanged();
 
 		//Random cleaning
 		buddiesByName.clear();
@@ -56,82 +61,112 @@ public class MultipartyConversation extends Conversation
 		Utils.random.nextBytes(privateKey);
 		Curve25519.keygen(publicKey, null, privateKey);
 
-		//Setup MUC chat
-		muc = new MultiUserChat(server.con, roomName + "@" + server.conferenceServer);
-
-		muc.addMessageListener(new PacketListener()
+		CryptocatService.getInstance().post(new ExceptionRunnable()
 		{
 			@Override
-			public void processPacket(Packet packet)
+			public void run() throws Exception
 			{
 				try
 				{
-					if (packet instanceof Message)
-					{
-						Message m = (Message) packet;
-						receivedMessage(getNickname(m.getFrom()), m.getBody());
-					}
-				} catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		});
-		muc.addParticipantListener(new PacketListener()
-		{
-			@Override
-			public void processPacket(Packet packet)
-			{
-				try
-				{
-					if (packet instanceof Presence)
-					{
-						Presence p = (Presence) packet;
-						String from = getNickname(p.getFrom());
-						System.out.println("Presence: " + p.getFrom() + " " + p.getType() + " " + p.getMode());
+					//Setup MUC chat
+					muc = new MultiUserChat(server.con, roomName + "@" + server.conferenceServer);
 
-						if (p.getType() == Presence.Type.available)
-							sendPublicKey(from);
-						if (p.getType() == Presence.Type.unavailable)
+					muc.addMessageListener(new PacketListener()
+					{
+						@Override
+						public void processPacket(final Packet packet)
 						{
-							//FIXME: This is broken, it doesn't get called. aSmack bug?
-							Buddy b = buddiesByName.remove(from);
-							buddies.remove(b);
-							notifyBuddyListChange();
-							System.out.println("LEAVE!");
-							addMessage(new CryptocatMessage(CryptocatMessage.Type.Leave, from, null));
+							CryptocatService.getInstance().uiPost(new ExceptionRunnable()
+							{
+								@Override
+								public void run() throws Exception
+								{
+									if (packet instanceof Message)
+									{
+										Message m = (Message) packet;
+										receivedMessage(getNickname(m.getFrom()), m.getBody());
+									}
+								}
+							});
 						}
-					}
-				} catch (Exception e)
+					});
+					muc.addParticipantListener(new PacketListener()
+					{
+						@Override
+						public void processPacket(final Packet packet)
+						{
+							CryptocatService.getInstance().uiPost(new ExceptionRunnable()
+							{
+								@Override
+								public void run() throws Exception
+								{
+									if (packet instanceof Presence)
+									{
+										Presence p = (Presence) packet;
+										String from = getNickname(p.getFrom());
+
+										if (p.getType() == Presence.Type.available)
+											sendPublicKey(from);
+										if (p.getType() == Presence.Type.unavailable)
+										{
+											//FIXME: This is broken, it doesn't get called. aSmack bug?
+											Buddy b = buddiesByName.remove(from);
+											buddies.remove(b);
+											notifyBuddyListChange();
+											addMessage(new CryptocatMessage(CryptocatMessage.Type.Leave, from, null));
+										}
+									}
+								}
+							});
+						}
+					});
+
+
+					//Request no history from the server.
+					DiscussionHistory history = new DiscussionHistory();
+					history.setMaxStanzas(0);
+
+					muc.join(nickname, "", history, SmackConfiguration.getPacketReplyTimeout());
+
+					state = State.Joined;
+					server.notifyStateChanged();
+				}
+				catch (Exception e)
 				{
 					e.printStackTrace();
+
+					state = State.Error;
+					server.notifyStateChanged();
 				}
 			}
 		});
-
-		//Request no history from the server.
-		DiscussionHistory history = new DiscussionHistory();
-		history.setMaxStanzas(0);
-
-		muc.join(nickname, "", history, SmackConfiguration.getPacketReplyTimeout());
-
-		state = State.Joined;
-		server.notifyStateChanged();
 	}
 
 	public void leave()
 	{
-		if (state == State.NotJoined)
+		if (state != State.Joined)
 			throw new IllegalStateException("You have not joined.");
 
+		for(OtrConversation c : privateConversations.values())
+			c.leave();
+
+		final MultiUserChat mucFinal = muc;
+
 		if (server.getState() != CryptocatServer.State.Disconnected)
-			muc.leave();
+			CryptocatService.getInstance().post(new ExceptionRunnable()
+			{
+				@Override
+				public void run() throws Exception
+				{
+					mucFinal.leave();
+				}
+			});
 
 		privateKey = null;
 		publicKey = null;
 		buddiesByName.clear();
 
-		state = State.NotJoined;
+		state = State.Left;
 		server.notifyStateChanged();
 	}
 
@@ -178,10 +213,17 @@ public class MultipartyConversation extends Conversation
 		return "[" + state + "] " + roomName;
 	}
 
-	private void sendJsonMessage(JsonMessage m) throws XMPPException
+	private void sendJsonMessage(JsonMessage m)
 	{
-		String send = GsonHelper.customGson.toJson(m);
-		muc.sendMessage(send);
+		final String send = GsonHelper.customGson.toJson(m);
+		CryptocatService.getInstance().post(new ExceptionRunnable()
+		{
+			@Override
+			public void run() throws Exception
+			{
+				muc.sendMessage(send);
+			}
+		});
 	}
 
 	private void sendPublicKey(String to) throws XMPPException
@@ -311,7 +353,7 @@ public class MultipartyConversation extends Conversation
 	public void sendMessage(String message) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException
 	{
 		//Check state
-		if (state == State.NotJoined)
+		if (state != State.Joined)
 			throw new IllegalStateException("You have not joined.");
 
 		// Append 64 random bytes to the string.
@@ -414,7 +456,6 @@ public class MultipartyConversation extends Conversation
 
 			System.arraycopy(digest, 0, messageSecret, 0, 32);
 			System.arraycopy(digest, 32, hmacSecret, 0, 32);
-			System.out.println("Connected: " + nickname);
 		}
 
 		private byte[] encryptAes(byte[] plaintext, byte[] iv) throws InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException

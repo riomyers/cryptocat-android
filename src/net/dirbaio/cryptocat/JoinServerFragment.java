@@ -32,16 +32,9 @@ public class JoinServerFragment extends BoundFragment
 			{
 				if (bound)
 				{
-					service.post(new ExceptionRunnable()
-					{
-						@Override
-						public void run() throws Exception
-						{
-							CryptocatServer server = new CryptocatServer("crypto.cat", "conference.crypto.cat", 5222);
-							service.addServer(server);
-							server.connect();
-						}
-					});
+					CryptocatServer server = new CryptocatServer("crypto.cat", "conference.crypto.cat", 5222);
+					service.addServer(server);
+					server.connect();
 				}
 			}
 		});

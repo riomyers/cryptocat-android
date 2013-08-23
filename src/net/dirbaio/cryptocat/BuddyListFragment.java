@@ -12,6 +12,7 @@ import net.dirbaio.cryptocat.protocol.CryptocatBuddyListener;
 import net.dirbaio.cryptocat.protocol.CryptocatServer;
 import net.dirbaio.cryptocat.protocol.MultipartyConversation;
 import net.dirbaio.cryptocat.protocol.OtrConversation;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,6 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 	public void onStart()
 	{
 		super.onStart();
-		getActivity().getActionBar().setTitle(conversationId);
 	}
 
 	@Override
@@ -54,40 +54,20 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 		buddyArrayAdapter = new BuddyAdapter(getActivity(), R.layout.item_buddy, conversation.buddies);
 		setListAdapter(buddyArrayAdapter);
 
-		service.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				conversation.addBuddyListener(BuddyListFragment.this);
-			}
-		});
+		conversation.addBuddyListener(BuddyListFragment.this);
 	}
 
 	@Override
 	protected void onServiceUnbind()
 	{
-		service.post(new ExceptionRunnable()
-		{
-			@Override
-			public void run() throws Exception
-			{
-				conversation.removeBuddyListener(BuddyListFragment.this);
-			}
-		});
+		conversation.removeBuddyListener(BuddyListFragment.this);
 	}
 
 	@Override
 	public void buddyListChanged()
 	{
-		handler.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				buddyArrayAdapter.notifyDataSetChanged();
-			}
-		});
+		buddyArrayAdapter.notifyDataSetChanged();
+
 	}
 
 	@Override
@@ -95,23 +75,17 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 	{
 		super.onListItemClick(listView, view, position, id);
 
-		final MultipartyConversation.Buddy b = buddyArrayAdapter.getItem(position);
-		service.post(new ExceptionRunnable()
+		MultipartyConversation.Buddy b = buddyArrayAdapter.getItem(position);
+
+		try
 		{
-			@Override
-			public void run() throws Exception
-			{
-				final OtrConversation o = conversation.startPrivateConversation(b.nickname);
-				handler.post(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						callbacks.onItemSelected(serverId, conversationId, o.id);
-					}
-				});
-			}
-		});
+			OtrConversation o = conversation.startPrivateConversation(b.nickname);
+			callbacks.onItemSelected(serverId, conversationId, o.id);
+		}
+		catch (XMPPException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	private class BuddyAdapter extends ArrayAdapter<MultipartyConversation.Buddy>

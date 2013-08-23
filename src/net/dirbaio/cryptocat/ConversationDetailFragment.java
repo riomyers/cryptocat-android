@@ -9,7 +9,17 @@ import android.widget.*;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import net.dirbaio.cryptocat.protocol.*;
+import org.jivesoftware.smack.XMPPException;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 
 /**
@@ -51,9 +61,9 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 		super.onStart();
 	}
 
-	private void updateTitle()
+    public void updateTitle()
 	{
-
+		if(conversation == null) return;
 
 		if(conversation instanceof MultipartyConversation)
 		{
@@ -85,20 +95,12 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 		if(buddyId != null)
 			conversation = ((MultipartyConversation)conversation).getPrivateConversation(buddyId);
 
-		System.err.println(serverId+", "+conversationId+", "+buddyId+", "+conversation);
 		conversationArrayAdapter = new ConversationAdapter(getActivity(), R.layout.item_message, conversation.history);
 		conversationView.setAdapter(conversationArrayAdapter);
 
-		service.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				conversation.addMessageListener(ConversationDetailFragment.this);
-				if(conversation instanceof MultipartyConversation)
-					((MultipartyConversation)conversation).addBuddyListener(ConversationDetailFragment.this);
-			}
-		});
+		conversation.addMessageListener(ConversationDetailFragment.this);
+		if(conversation instanceof MultipartyConversation)
+			((MultipartyConversation)conversation).addBuddyListener(ConversationDetailFragment.this);
 
 		updateTitle();
 	}
@@ -106,27 +108,13 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	@Override
 	protected void onServiceUnbind()
 	{
-		service.post(new ExceptionRunnable()
-		{
-			@Override
-			public void run() throws Exception
-			{
-				conversation.removeMessageListener(ConversationDetailFragment.this);
-			}
-		});
+		conversation.removeMessageListener(ConversationDetailFragment.this);
 	}
 
 	@Override
 	public void messageReceived(final CryptocatMessage message)
 	{
-		handler.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				conversationArrayAdapter.notifyDataSetChanged();
-			}
-		});
+		conversationArrayAdapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -148,14 +136,14 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 					final String str = text.getText().toString();
 					if (!str.isEmpty())
 					{
-						service.post(new ExceptionRunnable()
+						try
 						{
-							@Override
-							public void run() throws Exception
-							{
-								conversation.sendMessage(str);
-							}
-						});
+							conversation.sendMessage(str);
+						}
+						catch (Exception e)
+						{
+							e.printStackTrace();
+						}
 						text.setText("");
 					}
 				}

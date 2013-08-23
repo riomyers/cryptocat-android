@@ -5,16 +5,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import net.dirbaio.cryptocat.protocol.CryptocatService;
 
 public class BoundFragment extends Fragment
 {
 	//==============
 	// Service binding stuff
 
-	protected Handler handler;
 	protected CryptocatService service;
 	protected boolean bound = false;
 
@@ -22,8 +21,6 @@ public class BoundFragment extends Fragment
 	public void onStart()
 	{
 		super.onStart();
-
-		handler = new Handler();
 
 		// Bind to LocalService
 		Intent intent = new Intent(this.getActivity(), CryptocatService.class);
@@ -136,4 +133,12 @@ public class BoundFragment extends Fragment
 		{
 		}
 	};
+
+
+	//Title stuff
+
+	public void updateTitle()
+	{
+
+	}
 }

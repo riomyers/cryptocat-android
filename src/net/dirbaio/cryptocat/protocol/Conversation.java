@@ -25,15 +25,18 @@ public abstract class Conversation
 
 	public enum State
 	{
-		NotJoined,
+		Left,
 		Joined,
+		Leaving,
+		Joining,
+		Error
 	}
 
 	public Conversation(CryptocatServer server, String nickname) throws XMPPException
 	{
 		this.server = server;
 		this.nickname = nickname;
-		this.state = State.NotJoined;
+		this.state = State.Left;
 
 		this.id = Utils.randomString();
 	}
@@ -57,7 +60,6 @@ public abstract class Conversation
 	{
 		msgListeners.remove(l);
 	}
-
 
 	protected void addMessage(CryptocatMessage msg)
 	{

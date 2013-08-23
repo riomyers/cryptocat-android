@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import net.dirbaio.cryptocat.protocol.CryptocatService;
 
 public class MainActivity extends SherlockFragmentActivity
 		implements ConversationListFragment.Callbacks
@@ -16,6 +17,8 @@ public class MainActivity extends SherlockFragmentActivity
 	public static final String ARG_BUDDY_ID = "net.dirbaio.cryptocat.BUDDY_ID";
 
 	private SlidingMenu sm;
+
+	public BoundFragment currFragment;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -55,8 +58,7 @@ public class MainActivity extends SherlockFragmentActivity
 		onItemSelected(null, null, null);
 		setConversationListFragment(new ConversationListFragment());
 
-		getSupportActionBar().setSubtitle("Hello world!");
-		getSupportActionBar().setTitle("Cryptocat!");
+		getSupportActionBar().setTitle("Cryptocat");
 		//TODO Move this to ConversationListFragment since it's always true.
 		//FIXME PLS
 		//conversationList.setActivateOnItemClick(true);
@@ -100,7 +102,8 @@ public class MainActivity extends SherlockFragmentActivity
 		arguments.putString(ARG_SERVER_ID, server);
 		arguments.putString(ARG_CONVERSATION_ID, conversation);
 		arguments.putString(ARG_BUDDY_ID, buddy);
-		Fragment fragment, fragment2;
+		BoundFragment fragment;
+		Fragment fragment2;
 
 		if (server != null && conversation != null)
 		{
@@ -116,8 +119,10 @@ public class MainActivity extends SherlockFragmentActivity
 				fragment = new JoinServerFragment();
 		}
 
+		currFragment = fragment;
 		fragment.setArguments(arguments);
 		setConversationFragment(fragment);
+
 		fragment2.setArguments(arguments);
 		setBuddyListFragment(fragment2);
 

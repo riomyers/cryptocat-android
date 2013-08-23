@@ -9,6 +9,7 @@ import android.widget.EditText;
 import net.dirbaio.cryptocat.protocol.MultipartyConversation;
 import net.dirbaio.cryptocat.protocol.CryptocatServer;
 import net.dirbaio.cryptocat.protocol.CryptocatStateListener;
+import org.jivesoftware.smack.XMPPException;
 
 public class ServerDetailFragment extends BoundFragment implements CryptocatStateListener
 {
@@ -60,26 +61,19 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 			{
 				if (bound)
 				{
-					final String roomName = roomNameText.getText().toString();
-					final String nickname = nicknameText.getText().toString();
-					service.post(new ExceptionRunnable()
+					String roomName = roomNameText.getText().toString();
+					String nickname = nicknameText.getText().toString();
+					try
 					{
-						@Override
-						public void run() throws Exception
-						{
-							final MultipartyConversation c = server.createConversation(roomName, nickname);
-							handler.post(new Runnable()
-							{
-								@Override
-								public void run()
-								{
-									//Runnableception here.
-									callbacks.onItemSelected(serverId, c.id, null);
-								}
-							});
-							c.join();
-						}
-					});
+						MultipartyConversation c;
+						c = server.createConversation(roomName, nickname);
+						c.join();
+						callbacks.onItemSelected(serverId, c.id, null);
+					}
+					catch (XMPPException e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 		});
