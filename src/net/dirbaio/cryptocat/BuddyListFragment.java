@@ -51,7 +51,7 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 	protected void onServiceBind()
 	{
 		conversation = service.getServer(serverId).getConversation(conversationId);
-		buddyArrayAdapter = new BuddyAdapter(getActivity(), R.layout.item_buddy, conversation.buddies);
+		buddyArrayAdapter = new BuddyAdapter(getAltContext(), R.layout.item_buddy, conversation.buddies);
 		setListAdapter(buddyArrayAdapter);
 
 		conversation.addBuddyListener(BuddyListFragment.this);

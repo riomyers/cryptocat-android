@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import net.dirbaio.cryptocat.protocol.CryptocatService;
 
 public class BoundFragment extends Fragment
@@ -136,9 +138,26 @@ public class BoundFragment extends Fragment
 
 
 	//Title stuff
-
 	public void updateTitle()
 	{
 
+	}
+
+	private Context altContext;
+	protected Context getAltContext()
+	{
+		if(altContext == null)
+		{
+			// create ContextThemeWrapper from the original Activity Context with the custom theme
+			altContext = new ContextThemeWrapper(getActivity(), R.style.SlidingMenu);
+		}
+
+		return altContext;
+	}
+
+	protected LayoutInflater getAltInflater(LayoutInflater inflater)
+	{
+		// clone the inflater using the ContextThemeWrapper
+		return inflater.cloneInContext(getAltContext());
 	}
 }

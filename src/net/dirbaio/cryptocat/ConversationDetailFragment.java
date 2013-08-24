@@ -2,10 +2,12 @@ package net.dirbaio.cryptocat;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import net.dirbaio.cryptocat.protocol.*;
@@ -64,6 +66,9 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
     public void updateTitle()
 	{
 		if(conversation == null) return;
+		if(getActivity() == null) return;
+
+		ActionBar ab = ((SherlockFragmentActivity)getActivity()).getSupportActionBar();
 
 		if(conversation instanceof MultipartyConversation)
 		{
@@ -71,20 +76,20 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 
 			String subtitle = "";
 			for(MultipartyConversation.Buddy b : mp.buddies)
+			{
 				if(!subtitle.isEmpty())
-				{
 					subtitle += ", ";
-					subtitle += b.nickname;
-				}
-			((SherlockFragmentActivity)getActivity()).getSupportActionBar().setTitle(mp.roomName);
-			((SherlockFragmentActivity)getActivity()).getSupportActionBar().setSubtitle(subtitle);
+				subtitle += b.nickname;
+			}
+			ab.setTitle(mp.roomName);
+			ab.setSubtitle(subtitle);
 		}
 		else if(conversation instanceof OtrConversation)
 		{
 			OtrConversation priv = (OtrConversation) conversation;
 
-			((SherlockFragmentActivity)getActivity()).getSupportActionBar().setTitle(priv.parent.roomName);
-			((SherlockFragmentActivity)getActivity()).getSupportActionBar().setSubtitle(priv.buddyNickname);
+			ab.setTitle(priv.parent.roomName);
+			ab.setSubtitle(priv.buddyNickname);
 		}
 	}
 
@@ -125,7 +130,7 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 		conversationView = (ListView) rootView.findViewById(R.id.conversation);
 		conversationView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
-		final Button button = (Button) rootView.findViewById(R.id.send);
+		final ImageButton button = (ImageButton) rootView.findViewById(R.id.send);
 		final EditText text = (EditText) rootView.findViewById(R.id.text);
 		button.setOnClickListener(new View.OnClickListener()
 		{
@@ -183,23 +188,62 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 
 			if (item != null)
 			{
+				boolean me = item.nickname.equals(conversation.nickname);
+
+				boolean showNick = false;
+
+				if(!me &&
+						item.t == CryptocatMessage.Type.Message &&
+						conversation instanceof MultipartyConversation &&
+						(position == 0 || !getItem(position-1).nickname.equals(item.nickname)))
+					showNick = true;
+
 				TextView nickView = (TextView) view.findViewById(R.id.nickname);
-				nickView.setText(item.nickname);
-				if (position != 0)
+				if(showNick)
 				{
-					CryptocatMessage itemold = getItem(position - 1);
-					if (itemold.t == item.t && itemold.nickname.equals(item.nickname))
-						nickView.setVisibility(View.GONE);
-					else
-						nickView.setVisibility(View.VISIBLE);
+					nickView.setText(item.nickname);
+					nickView.setVisibility(View.VISIBLE);
 				}
 				else
-					nickView.setVisibility(View.VISIBLE);
+					nickView.setVisibility(View.GONE);
+
+
+				String txt;
+				int background;
+				int gravity;
+
+				switch (item.t)
+				{
+					case Message:
+						txt = item.text;
+						background = me?R.drawable.bubble_rev:R.drawable.bubble;
+						gravity = me?Gravity.RIGHT:Gravity.LEFT;
+						break;
+					case Join:
+						txt = item.nickname + " joined";
+						background = R.drawable.bubble_notif;
+						gravity = Gravity.CENTER;
+						break;
+					case Leave:
+						txt = item.nickname + " left";
+						background = R.drawable.bubble_notif;
+						gravity = Gravity.CENTER;
+						break;
+					default:
+						throw new IllegalStateException("Unknown item type");
+				}
+
 				TextView textView = (TextView) view.findViewById(R.id.text);
-				String txt = item.text;
-				if (item.t == CryptocatMessage.Type.Join) txt = "- Joined -";
-				if (item.t == CryptocatMessage.Type.Leave) txt = "- Left -";
 				textView.setText(txt);
+
+				View bubbleView = view.findViewById(R.id.bubble);
+				bubbleView.setBackgroundResource(background);
+
+				FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+						FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+				params.gravity = gravity;
+
+				bubbleView.setLayoutParams(params);
 			}
 
 			return view;

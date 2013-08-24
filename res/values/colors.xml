@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="transparent">#00000000</color>
+    <color name="bg_light">#FFFFFFFF</color>
+    <color name="bg_med">#FFC7E5F5</color>
+    <color name="bg_actionbar">#FF153b50</color>
+    <color name="border_light">#FF76BDE5</color>
+    <color name="clicked">#FF40a8e3</color>
+</resources>

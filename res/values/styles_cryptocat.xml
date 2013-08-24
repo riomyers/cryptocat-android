@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- File created by the Android Action Bar Style Generator
+
+     Copyright (C) 2011 The Android Open Source Project
+     Copyright (C) 2012 readyState Software Ltd
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+  
+          http://www.apache.org/licenses/LICENSE-2.0
+  
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<resources>
+
+    <style name="Theme.Cryptocat" parent="@style/Theme.Sherlock.Light.DarkActionBar">
+        <item name="actionBarItemBackground">@drawable/selectable_background_cryptocat</item>
+        <item name="popupMenuStyle">@style/PopupMenu.Cryptocat</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Cryptocat</item>
+        <item name="actionBarTabStyle">@style/ActionBarTabStyle.Cryptocat</item>
+        <item name="actionDropDownStyle">@style/DropDownNav.Cryptocat</item>
+        <item name="actionBarStyle">@style/ActionBar.Solid.Cryptocat</item>
+        <item name="actionModeBackground">@drawable/cab_background_top_cryptocat</item>
+        <item name="actionModeSplitBackground">@drawable/cab_background_bottom_cryptocat</item>
+        <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Cryptocat</item>
+
+                <!-- Light.DarkActionBar specific -->
+        <item name="actionBarWidgetTheme">@style/Theme.Cryptocat.Widget</item>
+
+        <item name="android:windowBackground">@color/bg_med</item>
+    </style>
+
+
+    <style name="SlidingMenu" parent="@android:style/Theme.Holo">
+    </style>
+
+    <style name="SlidingMenuFrame">
+        <item name="android:background">#151520</item>
+    </style>
+
+    <style name="Bubble">
+        <item name="android:background">@drawable/bubble</item>
+        <item name="android:gravity">left</item>
+        <item name="android:showDividers">none</item>
+    </style>
+
+    <style name="BubbleRev" parent="@style/Bubble">
+        <item name="android:background">@drawable/bubble_rev</item>
+        <item name="android:gravity">right</item>
+    </style>
+
+    <style name="BubbleNotif" parent="@style/Bubble">
+        <item name="android:background">@drawable/bubble_rev</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="ConversationBottom">
+        <item name="android:background">@drawable/bottom</item>
+    </style>
+
+    <style name="ActionBar.Solid.Cryptocat" parent="@style/Widget.Sherlock.Light.ActionBar.Solid.Inverse">
+        <item name="background">@drawable/ab_solid_cryptocat</item>
+        <item name="backgroundStacked">@drawable/ab_stacked_solid_cryptocat</item>
+        <item name="backgroundSplit">@drawable/ab_bottom_solid_cryptocat</item>
+        <item name="progressBarStyle">@style/ProgressBar.Cryptocat</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Cryptocat" parent="@style/Widget.Sherlock.ActionBar">
+        <item name="background">@drawable/ab_transparent_cryptocat</item>
+        <item name="progressBarStyle">@style/ProgressBar.Cryptocat</item>
+    </style>
+
+    <style name="PopupMenu.Cryptocat" parent="@style/Widget.Sherlock.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_cryptocat</item>
+    </style>
+
+    <style name="DropDownListView.Cryptocat" parent="@style/Widget.Sherlock.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_cryptocat</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Cryptocat" parent="@style/Widget.Sherlock.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_cryptocat</item>
+    </style>
+
+    <style name="DropDownNav.Cryptocat" parent="@style/Widget.Sherlock.Spinner.DropDown.ActionBar">
+        <item name="android:background">@drawable/spinner_background_ab_cryptocat</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_cryptocat</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_cryptocat</item>
+    </style>
+
+    <style name="ProgressBar.Cryptocat" parent="@style/Widget.Sherlock.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_cryptocat</item>
+    </style>
+
+    <style name="ActionButton.CloseMode.Cryptocat" parent="@style/Widget.Sherlock.ActionButton.CloseMode">
+        <item name="android:background">@drawable/btn_cab_done_cryptocat</item>
+    </style>
+
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Cryptocat.Widget" parent="@style/Theme.Sherlock">
+        <item name="popupMenuStyle">@style/PopupMenu.Cryptocat</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Cryptocat</item>
+    </style>
+
+</resources>

@@ -53,7 +53,7 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	{
 		service.addStateListener(this);
 		service.getConversationList(conversations);
-		conversationArrayAdapter = new ConversationAdapter(getActivity(), R.layout.item_conversation, conversations);
+		conversationArrayAdapter = new ConversationAdapter(getAltContext(), R.layout.item_conversation, conversations);
 		setListAdapter(conversationArrayAdapter);
 		service.addStateListener(this);
 	}
