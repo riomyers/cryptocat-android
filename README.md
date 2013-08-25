@@ -7,7 +7,7 @@ This is a project I've started for the 2013 Cryptocat Hackathon: a Java implemen
 
 **NOTE**: It's compatible with the latest Cryptocat master, not the released version. There have been some protocol changes that are still pending for release. See cryptocat/cryptocat#410 for more details.
 
-Some screenshots: http://imgur.com/a/NlB09
+Some screenshots: http://imgur.com/a/YQdpT
 
 What's done
 ---
@@ -21,7 +21,7 @@ What's not done (yet)
 ---
 
 * Fingerprint showing
-* OTR (1-to-1) chat
+* OTR (1-to-1) chat -- in progress
 * File transfer
 * Smilies!
 * Custom server
@@ -30,18 +30,16 @@ What's not done (yet)
    * Join/leave rooms
    * Proper Back button
 * Proper notifications
-* Tablet-friendly layout
-* Make it not look ugly
+* Tablet-friendly layout (it's easy to do)
+* Make it not look ugly -- in progress
 * Many other things
 
 Known bugs (they will get fixed!)
 ---
 * No fix for the broken Android SecureRandom
 * SSL certificate checking is not working (I think)
-* There's a bug in aSmack that fails to notify the app when someone leaves
-* It doesn't work (?) if you join the same room with two nicknames
-* Reconnection doesn't work
-* Sometimes you get randomly disconnected and the app fails to see it
+* No auto-reconnection.
+* Sometimes you get randomly disconnected and the app fails to see it (maybe it's fixed)
 * No way to close the service (It should close when you disconnect from all servers)
 
 How to build
