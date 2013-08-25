@@ -6,9 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import net.dirbaio.cryptocat.protocol.MultipartyConversation;
-import net.dirbaio.cryptocat.protocol.CryptocatServer;
-import net.dirbaio.cryptocat.protocol.CryptocatStateListener;
+import net.dirbaio.cryptocat.service.MultipartyConversation;
+import net.dirbaio.cryptocat.service.CryptocatServer;
+import net.dirbaio.cryptocat.service.CryptocatStateListener;
 import org.jivesoftware.smack.XMPPException;
 
 public class ServerDetailFragment extends BoundFragment implements CryptocatStateListener
@@ -18,11 +18,25 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 	private CryptocatServer server;
 
 	private View rootView;
+	private int oldVisible = -1;
 
 	@Override
 	public void stateChanged()
 	{
-		//TODO Add some indication the server is connected or disconnected in this fragment
+		int visible = R.id.not_connected;
+		if(server.getState() == CryptocatServer.State.Connected)
+			visible = R.id.join;
+		if(server.getState() == CryptocatServer.State.Connecting)
+			visible = R.id.connecting;
+
+		if(oldVisible != visible)
+		{
+			rootView.findViewById(R.id.not_connected).setVisibility(visible==R.id.not_connected?View.VISIBLE:View.GONE);
+			rootView.findViewById(R.id.join).setVisibility(visible==R.id.join?View.VISIBLE:View.GONE);
+			rootView.findViewById(R.id.connecting).setVisibility(visible==R.id.connecting?View.VISIBLE:View.GONE);
+
+			oldVisible = visible;
+		}
 	}
 
 	@Override
@@ -38,6 +52,7 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 	{
 		server = service.getServer(serverId);
 		server.addStateListener(this);
+		stateChanged();
 	}
 
 	@Override
@@ -51,7 +66,7 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 	{
 		rootView = inflater.inflate(R.layout.fragment_server_detail, container, false);
 
-		final Button button = (Button) rootView.findViewById(R.id.button);
+		final Button button = (Button) rootView.findViewById(R.id.join_button);
 		final EditText roomNameText = (EditText) rootView.findViewById(R.id.name);
 		final EditText nicknameText = (EditText) rootView.findViewById(R.id.nickname);
 
@@ -78,6 +93,18 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 			}
 		});
 
+		final Button button2 = (Button) rootView.findViewById(R.id.reconnect_button);
+		button2.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				if(bound)
+				{
+					server.connect();
+				}
+			}
+		});
 		return rootView;
 	}
 }

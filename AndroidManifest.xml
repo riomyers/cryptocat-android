@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".protocol.CryptocatService"/>
+        <service android:name=".service.CryptocatService"/>
     </application>
 
 </manifest>

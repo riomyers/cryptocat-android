@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import net.dirbaio.cryptocat.protocol.CryptocatServer;
+import net.dirbaio.cryptocat.service.CryptocatServer;
 
 public class JoinServerFragment extends BoundFragment
 {
@@ -32,9 +32,10 @@ public class JoinServerFragment extends BoundFragment
 			{
 				if (bound)
 				{
-					CryptocatServer server = new CryptocatServer("crypto.cat", "conference.crypto.cat", 5222);
-					service.addServer(server);
+					//TODO Error if already connected to server
+					CryptocatServer server = service.createServer("crypto.cat", "conference.crypto.cat", 5222);
 					server.connect();
+					callbacks.onItemSelected(server.id, null, null);
 				}
 			}
 		});

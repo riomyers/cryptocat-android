@@ -20,7 +20,8 @@
                 android:layout_weight="1.0"
                 android:hint="@string/saysomething"
                 android:id="@+id/text" android:phoneNumber="false" android:password="false"
-                android:layout_gravity="center" android:layout_margin="3dp">
+                android:layout_gravity="center" android:layout_margin="3dp" android:inputType="textShortMessage|text|textMultiLine|textCapSentences|textAutoCorrect"
+                android:imeOptions="actionSend">
             <requestFocus/>
         </EditText>
         <ImageButton

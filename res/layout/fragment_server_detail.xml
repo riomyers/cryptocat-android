@@ -1,36 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Join room"
-            android:id="@+id/textView2" android:layout_gravity="center"/>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Room name"
-            android:id="@+id/textView" android:layout_gravity="center"/>
-    <EditText
+    <LinearLayout
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/name"/>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nickname"
-            android:id="@+id/textView1" android:layout_gravity="center"/>
-    <EditText
+            android:layout_height="fill_parent" android:id="@+id/join">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/join_room"
+                android:id="@+id/textView2" android:layout_gravity="center"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nickname"
+                android:id="@+id/textView1" android:layout_gravity="center"/>
+        <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/nickname" android:inputType="textAutoCorrect"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/room_name"
+                android:id="@+id/textView" android:layout_gravity="center"/>
+        <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/name" android:inputType="textAutoCorrect"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/join"
+                android:id="@+id/join_button" android:layout_gravity="center"/>
+    </LinearLayout>
+    <LinearLayout
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/nickname"/>
-    <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Join"
-            android:id="@+id/button" android:layout_gravity="center"/>
-</LinearLayout>
+            android:layout_height="fill_parent" android:id="@+id/connecting">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/connecting_to_server"
+                android:id="@+id/textView3" android:layout_gravity="center" android:layout_marginTop="36dp"/>
+        <ProgressBar
+                android:layout_width="96dp"
+                android:layout_height="86dp"
+                android:id="@+id/progressBar" android:layout_gravity="center" android:layout_marginTop="27dp"/>
+    </LinearLayout>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" android:id="@+id/not_connected">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_connected_to_server"
+                android:id="@+id/textView4" android:layout_gravity="center"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reconnect"
+                android:id="@+id/reconnect_button" android:layout_gravity="center"/>
+    </LinearLayout>
+</FrameLayout>

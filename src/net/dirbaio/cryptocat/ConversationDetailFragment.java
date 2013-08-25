@@ -2,26 +2,13 @@ package net.dirbaio.cryptocat;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
+import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import net.dirbaio.cryptocat.protocol.*;
-import org.jivesoftware.smack.XMPPException;
+import net.dirbaio.cryptocat.service.*;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 
 /**
@@ -38,6 +25,8 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	private ArrayAdapter<CryptocatMessage> conversationArrayAdapter;
 	private ListView conversationView;
 	private View rootView;
+	private ImageButton sendButton;
+	private EditText text;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -130,34 +119,51 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 		conversationView = (ListView) rootView.findViewById(R.id.conversation);
 		conversationView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
-		final ImageButton button = (ImageButton) rootView.findViewById(R.id.send);
-		final EditText text = (EditText) rootView.findViewById(R.id.text);
-		button.setOnClickListener(new View.OnClickListener()
+		sendButton = (ImageButton) rootView.findViewById(R.id.send);
+		text = (EditText) rootView.findViewById(R.id.text);
+		sendButton.setOnClickListener(new View.OnClickListener()
 		{
 			public void onClick(View v)
 			{
-				if (bound)
+				sendMessage(text.getText().toString());
+			}
+		});
+		text.setOnEditorActionListener(new TextView.OnEditorActionListener()
+		{
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
+			{
+				boolean handled = false;
+				if (actionId == EditorInfo.IME_ACTION_SEND)
 				{
-					final String str = text.getText().toString();
-					if (!str.isEmpty())
-					{
-						try
-						{
-							conversation.sendMessage(str);
-						}
-						catch (Exception e)
-						{
-							e.printStackTrace();
-						}
-						text.setText("");
-					}
+					sendMessage(text.getText().toString());
+					handled = true;
 				}
+				return handled;
 			}
 		});
 
 		return rootView;
 	}
 
+	private void sendMessage(String str)
+	{
+		if (bound)
+		{
+			if (!str.isEmpty())
+			{
+				try
+				{
+					conversation.sendMessage(str);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+				text.setText("");
+			}
+		}
+	}
 	@Override
 	public void buddyListChanged()
 	{

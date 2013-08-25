@@ -8,10 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import net.dirbaio.cryptocat.protocol.CryptocatBuddyListener;
-import net.dirbaio.cryptocat.protocol.CryptocatServer;
-import net.dirbaio.cryptocat.protocol.MultipartyConversation;
-import net.dirbaio.cryptocat.protocol.OtrConversation;
+import net.dirbaio.cryptocat.service.CryptocatBuddyListener;
+import net.dirbaio.cryptocat.service.MultipartyConversation;
+import net.dirbaio.cryptocat.service.OtrConversation;
 import org.jivesoftware.smack.XMPPException;
 
 import java.util.ArrayList;

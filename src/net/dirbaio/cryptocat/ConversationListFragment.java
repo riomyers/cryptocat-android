@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import net.dirbaio.cryptocat.protocol.MultipartyConversation;
-import net.dirbaio.cryptocat.protocol.CryptocatServer;
-import net.dirbaio.cryptocat.protocol.CryptocatStateListener;
-import net.dirbaio.cryptocat.protocol.OtrConversation;
+import net.dirbaio.cryptocat.service.MultipartyConversation;
+import net.dirbaio.cryptocat.service.CryptocatServer;
+import net.dirbaio.cryptocat.service.CryptocatStateListener;
+import net.dirbaio.cryptocat.service.OtrConversation;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat.protocol;
+package net.dirbaio.cryptocat.service;
 
 import net.dirbaio.cryptocat.ExceptionRunnable;
 import org.jivesoftware.smack.Chat;
@@ -16,6 +16,10 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
+/**
+ * An OTR conversation.
+ * TODO: Actually use OTR. (lol)
+ */
 public class OtrConversation extends Conversation implements MessageListener
 {
 	public final String buddyNickname;
@@ -27,6 +31,7 @@ public class OtrConversation extends Conversation implements MessageListener
 		super(parent.server, parent.nickname);
 		this.parent = parent;
 		this.buddyNickname = buddyNickname;
+		this.id = buddyNickname;
 	}
 
 	@Override

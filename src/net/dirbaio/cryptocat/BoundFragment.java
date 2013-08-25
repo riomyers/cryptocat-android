@@ -9,7 +9,7 @@ import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
-import net.dirbaio.cryptocat.protocol.CryptocatService;
+import net.dirbaio.cryptocat.service.CryptocatService;
 
 public class BoundFragment extends Fragment
 {

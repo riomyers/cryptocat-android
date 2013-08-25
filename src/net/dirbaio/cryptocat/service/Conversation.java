@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat.protocol;
+package net.dirbaio.cryptocat.service;
 
 import org.jivesoftware.smack.XMPPException;
 
@@ -18,7 +18,7 @@ public abstract class Conversation
 	private final ArrayList<CryptocatMessageListener> msgListeners = new ArrayList<>();
 	public CryptocatServer server;
 	public final String nickname;
-	public final String id;
+	public String id;
 	public final ArrayList<CryptocatMessage> history = new ArrayList<>();
 
 	protected State state;
@@ -37,8 +37,6 @@ public abstract class Conversation
 		this.server = server;
 		this.nickname = nickname;
 		this.state = State.Left;
-
-		this.id = Utils.randomString();
 	}
 
 	public final State getState()

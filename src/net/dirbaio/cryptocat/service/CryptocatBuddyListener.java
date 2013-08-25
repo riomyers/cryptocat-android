@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat.protocol;
+package net.dirbaio.cryptocat.service;
 
 public interface CryptocatBuddyListener
 {

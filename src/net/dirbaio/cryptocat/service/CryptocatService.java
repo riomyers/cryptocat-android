@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat.protocol;
+package net.dirbaio.cryptocat.service;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -113,11 +113,15 @@ public class CryptocatService extends Service implements CryptocatStateListener
 
 	//CryptocatServer stuff.
 
-	public void addServer(CryptocatServer s)
+	public CryptocatServer createServer(String server, String conferenceServer, int port)
 	{
+		CryptocatServer s = new CryptocatServer(server, conferenceServer, port);
+		if(servers.containsKey(s.id))
+			throw new AlreadyConnectedException();
 		servers.put(s.id, s);
 		s.addStateListener(this);
 		stateChanged();
+		return s;
 	}
 
 	public CryptocatServer getServer(String id)

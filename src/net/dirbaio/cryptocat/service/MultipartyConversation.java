@@ -1,4 +1,4 @@
-package net.dirbaio.cryptocat.protocol;
+package net.dirbaio.cryptocat.service;
 
 import net.dirbaio.cryptocat.ExceptionRunnable;
 import org.jivesoftware.smack.PacketListener;
@@ -16,6 +16,11 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.*;
 import java.util.*;
+
+/**
+ * A multiparty conversation.
+ * TODO: Separate the multiparty crypto protocol from the XMPP logic. Right now, it's a bit messy.
+ */
 
 public class MultipartyConversation extends Conversation
 {
@@ -36,10 +41,12 @@ public class MultipartyConversation extends Conversation
 	private final HashMap<String, OtrConversation> privateConversationsByNick = new HashMap<>();
 	private final ArrayList<CryptocatBuddyListener> buddyListeners = new ArrayList<>();
 
+
 	public MultipartyConversation(CryptocatServer server, String roomName, String nickname) throws XMPPException
 	{
 		super(server, nickname);
 		this.roomName = roomName;
+		this.id = roomName;
 	}
 
 	public void join() throws XMPPException
@@ -110,10 +117,14 @@ public class MultipartyConversation extends Conversation
 										if (p.getType() == Presence.Type.unavailable)
 										{
 											//FIXME: This is broken, it doesn't get called. aSmack bug?
-											Buddy b = buddiesByName.remove(from);
-											buddies.remove(b);
-											notifyBuddyListChange();
-											addMessage(new CryptocatMessage(CryptocatMessage.Type.Leave, from, null));
+											//Now it does get called? Why? Needs investigation, it seems buggy.
+											if(buddiesByName.containsKey(from))
+											{
+												Buddy b = buddiesByName.remove(from);
+												buddies.remove(b);
+												notifyBuddyListChange();
+												addMessage(new CryptocatMessage(CryptocatMessage.Type.Leave, from, null));
+											}
 										}
 									}
 								}

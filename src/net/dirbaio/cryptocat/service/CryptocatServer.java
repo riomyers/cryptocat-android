@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.dirbaio.cryptocat.protocol;
+package net.dirbaio.cryptocat.service;
 
 import android.os.Build;
 import net.dirbaio.cryptocat.ExceptionRunnable;
@@ -51,7 +51,7 @@ public class CryptocatServer
 
 	public void connect()
 	{
-		if (state != State.Disconnected)
+		if (state != State.Disconnected && state != State.Error)
 			throw new IllegalStateException("You're already connected to this server.");
 
 		state = State.Connecting;

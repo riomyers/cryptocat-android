@@ -14,12 +14,12 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome to Cryptocat!"
+            android:text="@string/welcome"
             android:id="@+id/textView" android:layout_gravity="center"/>
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Get chatting!"
+            android:text="@string/connect_to_cryptocat"
             android:id="@+id/connect_default" android:layout_gravity="center" android:layout_marginTop="38dp"/>
     <TextView
             android:layout_width="wrap_content"

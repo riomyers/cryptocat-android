@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import net.dirbaio.cryptocat.protocol.CryptocatService;
+import net.dirbaio.cryptocat.service.CryptocatService;
 
 public class MainActivity extends SherlockFragmentActivity
 		implements ConversationListFragment.Callbacks

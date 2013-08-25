@@ -7,7 +7,7 @@
  *
  * Based on work by Daniel J Bernstein, http://cr.yp.to/ecdh.html
  */
-package net.dirbaio.cryptocat.protocol;
+package net.dirbaio.cryptocat.service;
 
 public class Curve25519
 {
