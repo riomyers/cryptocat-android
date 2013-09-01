@@ -56,6 +56,8 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 		conversationArrayAdapter = new ConversationAdapter(getAltContext(), R.layout.item_conversation, conversations);
 		setListAdapter(conversationArrayAdapter);
 		service.addStateListener(this);
+
+		setActivateOnItemClick(true);
 	}
 
 	@Override
@@ -83,7 +85,6 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 		service.getConversationList(conversations);
 		conversationArrayAdapter.notifyDataSetChanged();
 	}
-
 
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, long id)
@@ -145,6 +146,38 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 		}
 
 		activatedPosition = position;
+	}
+
+	private int getPositionFor(String server, String conversation, String buddy)
+	{
+		int i = 0;
+		for(Object o : conversations)
+		{
+			if(o instanceof CryptocatServer && conversation == null && buddy == null)
+			{
+				CryptocatServer s = (CryptocatServer) o;
+				if(s.id.equals(server))
+					return i;
+			}
+			if(o instanceof MultipartyConversation && buddy == null)
+			{
+				MultipartyConversation c = (MultipartyConversation) o;
+				if(c.server.id.equals(server) && c.id.equals(conversation))
+					return i;
+			}
+			if(o instanceof OtrConversation)
+			{
+				OtrConversation c = (OtrConversation) o;
+				if(c.server.id.equals(server) && c.parent.id.equals(conversation) && c.id.equals(buddy))
+					return i;
+			}
+			i++;
+		}
+		return -1;
+	}
+	public void setSelectedItem(String server, String conversation, String buddy)
+	{
+		setSelection(getPositionFor(server, conversation, buddy));
 	}
 
 	private class ConversationAdapter extends ArrayAdapter<Object>

@@ -15,10 +15,17 @@ public class MainActivity extends SherlockFragmentActivity
 	public static final String ARG_SERVER_ID = "net.dirbaio.cryptocat.SERVER_ID";
 	public static final String ARG_CONVERSATION_ID = "net.dirbaio.cryptocat.CONVERSATION_ID";
 	public static final String ARG_BUDDY_ID = "net.dirbaio.cryptocat.BUDDY_ID";
+	public static final String STATE_MENU_SHOWING = "net.dirbaio.cryptocat.MENU_SHOWING";
+	public static final String STATE_SECONDARY_MENU_SHOWING = "net.dirbaio.cryptocat.SECONDARY_MENU_SHOWING";
+	public static final String STATE_SELECTED_SERVER = "net.dirbaio.cryptocat.SELECTED_SERVER";
+	public static final String STATE_SELECTED_CONVERSATION = "net.dirbaio.cryptocat.SELECTED_CONVERSATION";
+	public static final String STATE_SELECTED_BUDDY = "net.dirbaio.cryptocat.SELECTED_BUDDY";
 
 	private SlidingMenu sm;
 
 	public BoundFragment currFragment;
+	private ConversationListFragment conversationList;
+	private String selectedServer, selectedConversation, selectedBuddy;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -27,9 +34,6 @@ public class MainActivity extends SherlockFragmentActivity
 
 		//Start the service if it isn't already started.
 		startService(new Intent(this, CryptocatService.class));
-
-		//Setup view stuff.
-//	    setTitle("Hello World!");
 
 		//Main content view
 		setContentView(R.layout.frame_conversation_detail);
@@ -53,17 +57,35 @@ public class MainActivity extends SherlockFragmentActivity
 		//SlidingMenu right view (user list)
 		sm.setSecondaryMenu(R.layout.frame_buddy_list);
 
+		//Restore instance state.
+		if(savedInstanceState != null)
+		{
+			if(savedInstanceState.getBoolean(STATE_SECONDARY_MENU_SHOWING))
+				sm.showSecondaryMenu(false);
+			else if(savedInstanceState.getBoolean(STATE_MENU_SHOWING))
+				sm.showMenu(false);
 
-		//All done, now set contents on these!
-		onItemSelected(null, null, null);
-		setConversationListFragment(new ConversationListFragment());
+			selectedServer = savedInstanceState.getString(STATE_SELECTED_SERVER);
+			selectedConversation = savedInstanceState.getString(STATE_SELECTED_CONVERSATION);
+			selectedBuddy = savedInstanceState.getString(STATE_SELECTED_BUDDY);
+		}
+
+		//Create conversation list
+		conversationList = new ConversationListFragment();
+		setConversationListFragment(conversationList);
 
 		getSupportActionBar().setTitle("Cryptocat");
-		//TODO Move this to ConversationListFragment since it's always true.
-		//FIXME PLS
-		//conversationList.setActivateOnItemClick(true);
 
 		// TODO: If exposing deep links into your app, handle intents here.
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+
+		//All done, now set contents!
+		selectItem(selectedServer, selectedConversation, selectedBuddy);
 	}
 
 	private void setFragment(int id, Fragment fragment)
@@ -88,6 +110,17 @@ public class MainActivity extends SherlockFragmentActivity
 		setFragment(R.id.buddy_list_container, fragment);
 	}
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(STATE_SECONDARY_MENU_SHOWING, sm.isSecondaryMenuShowing());
+		outState.putBoolean(STATE_MENU_SHOWING, sm.isMenuShowing());
+		outState.putString(STATE_SELECTED_SERVER, selectedServer);
+		outState.putString(STATE_SELECTED_CONVERSATION, selectedConversation);
+		outState.putString(STATE_SELECTED_BUDDY, selectedBuddy);
+	}
+
 	/**
 	 * Callback method from {@link ConversationListFragment.Callbacks}
 	 * indicating that the item with the given ID was selected.
@@ -95,6 +128,18 @@ public class MainActivity extends SherlockFragmentActivity
 	@Override
 	public void onItemSelected(String server, String conversation, String buddy)
 	{
+		selectItem(server, conversation, buddy);
+		sm.showContent();
+	}
+
+	public void selectItem(String server, String conversation, String buddy)
+	{
+		selectedServer = server;
+		selectedConversation = conversation;
+		selectedBuddy = buddy;
+
+		conversationList.setSelectedItem(server, conversation, buddy);
+
 		// In two-pane mode, show the detail view in this activity by
 		// adding or replacing the detail fragment using a
 		// fragment transaction.
@@ -125,7 +170,5 @@ public class MainActivity extends SherlockFragmentActivity
 
 		fragment2.setArguments(arguments);
 		setBuddyListFragment(fragment2);
-
-		sm.showContent();
 	}
 }

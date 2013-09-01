@@ -18,26 +18,35 @@ public class BoundFragment extends Fragment
 
 	protected CryptocatService service;
 	protected boolean bound = false;
+	private ServiceConnection connection;
 
 	@Override
-	public void onStart()
+	public void onResume()
 	{
-		super.onStart();
+		super.onResume();
 
 		// Bind to LocalService
 		Intent intent = new Intent(this.getActivity(), CryptocatService.class);
+		connection = new CryptocatServiceConnection();
 		getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+		System.err.println("FRAGMENT RESUME"+this);
 	}
 
 	@Override
-	public void onStop()
+	public void onPause()
 	{
-		super.onStop();
+		System.err.println("FRAGMENT PAUSE"+this);
+		super.onPause();
 		if (bound)
 		{
 			onServiceUnbind();
 			getActivity().unbindService(connection);
+			connection = null;
 			bound = false;
+		}
+		else
+		{
+			System.err.println("NOT BOUND !!!!");
 		}
 	}
 
@@ -55,7 +64,7 @@ public class BoundFragment extends Fragment
 	/**
 	 * Defines callbacks for service binding, passed to bindService()
 	 */
-	private final ServiceConnection connection = new ServiceConnection()
+	private class CryptocatServiceConnection implements ServiceConnection
 	{
 
 		@Override
@@ -75,7 +84,7 @@ public class BoundFragment extends Fragment
 		{
 			bound = false;
 		}
-	};
+	}
 
 
 	//=============
