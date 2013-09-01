@@ -30,13 +30,10 @@ public class JoinServerFragment extends BoundFragment
 		{
 			public void onClick(View v)
 			{
-				if (bound)
-				{
-					//TODO Error if already connected to server
-					CryptocatServer server = service.createServer("crypto.cat", "conference.crypto.cat", 5222);
-					server.connect();
-					callbacks.onItemSelected(server.id, null, null);
-				}
+				//TODO Error if already connected to server
+				CryptocatServer server = getService().createServer("crypto.cat", "conference.crypto.cat", 5222);
+				server.connect();
+				callbacks.onItemSelected(server.id, null, null);
 			}
 		});
 

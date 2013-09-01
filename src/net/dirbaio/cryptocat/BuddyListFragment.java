@@ -47,9 +47,10 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 	}
 
 	@Override
-	protected void onServiceBind()
+	public void onResume()
 	{
-		conversation = service.getServer(serverId).getConversation(conversationId);
+		super.onResume();
+		conversation = getService().getServer(serverId).getConversation(conversationId);
 		buddyArrayAdapter = new BuddyAdapter(getAltContext(), R.layout.item_buddy, conversation.buddies);
 		setListAdapter(buddyArrayAdapter);
 
@@ -57,8 +58,9 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 	}
 
 	@Override
-	protected void onServiceUnbind()
+	public void onPause()
 	{
+		super.onPause();
 		conversation.removeBuddyListener(BuddyListFragment.this);
 	}
 

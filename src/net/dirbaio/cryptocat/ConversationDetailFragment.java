@@ -83,9 +83,10 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	}
 
 	@Override
-	protected void onServiceBind()
+	public void onResume()
 	{
-		conversation = service.getServer(serverId).getConversation(conversationId);
+		super.onResume();
+		conversation = getService().getServer(serverId).getConversation(conversationId);
 		if(buddyId != null)
 			conversation = ((MultipartyConversation)conversation).getPrivateConversation(buddyId);
 
@@ -100,8 +101,9 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	}
 
 	@Override
-	protected void onServiceUnbind()
+	public void onPause()
 	{
+		super.onPause();
 		conversation.removeMessageListener(ConversationDetailFragment.this);
 	}
 
@@ -148,22 +150,20 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 
 	private void sendMessage(String str)
 	{
-		if (bound)
+		if (!str.isEmpty())
 		{
-			if (!str.isEmpty())
+			try
 			{
-				try
-				{
-					conversation.sendMessage(str);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-				text.setText("");
+				conversation.sendMessage(str);
 			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			text.setText("");
 		}
 	}
+
 	@Override
 	public void buddyListChanged()
 	{

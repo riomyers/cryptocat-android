@@ -48,16 +48,18 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 	}
 
 	@Override
-	protected void onServiceBind()
+	public void onResume()
 	{
-		server = service.getServer(serverId);
+		super.onResume();
+		server = getService().getServer(serverId);
 		server.addStateListener(this);
 		stateChanged();
 	}
 
 	@Override
-	protected void onServiceUnbind()
+	public void onPause()
 	{
+		super.onPause();
 		server.removeStateListener(this);
 	}
 
@@ -74,21 +76,18 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 		{
 			public void onClick(View v)
 			{
-				if (bound)
+				String roomName = roomNameText.getText().toString();
+				String nickname = nicknameText.getText().toString();
+				try
 				{
-					String roomName = roomNameText.getText().toString();
-					String nickname = nicknameText.getText().toString();
-					try
-					{
-						MultipartyConversation c;
-						c = server.createConversation(roomName, nickname);
-						c.join();
-						callbacks.onItemSelected(serverId, c.id, null);
-					}
-					catch (XMPPException e)
-					{
-						e.printStackTrace();
-					}
+					MultipartyConversation c;
+					c = server.createConversation(roomName, nickname);
+					c.join();
+					callbacks.onItemSelected(serverId, c.id, null);
+				}
+				catch (XMPPException e)
+				{
+					e.printStackTrace();
 				}
 			}
 		});
@@ -99,10 +98,7 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 			@Override
 			public void onClick(View view)
 			{
-				if(bound)
-				{
-					server.connect();
-				}
+				server.connect();
 			}
 		});
 		return rootView;

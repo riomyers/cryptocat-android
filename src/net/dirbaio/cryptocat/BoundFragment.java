@@ -13,80 +13,6 @@ import net.dirbaio.cryptocat.service.CryptocatService;
 
 public class BoundFragment extends Fragment
 {
-	//==============
-	// Service binding stuff
-
-	protected CryptocatService service;
-	protected boolean bound = false;
-	private ServiceConnection connection;
-
-	@Override
-	public void onResume()
-	{
-		super.onResume();
-
-		// Bind to LocalService
-		Intent intent = new Intent(this.getActivity(), CryptocatService.class);
-		connection = new CryptocatServiceConnection();
-		getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
-		System.err.println("FRAGMENT RESUME"+this);
-	}
-
-	@Override
-	public void onPause()
-	{
-		System.err.println("FRAGMENT PAUSE"+this);
-		super.onPause();
-		if (bound)
-		{
-			onServiceUnbind();
-			getActivity().unbindService(connection);
-			connection = null;
-			bound = false;
-		}
-		else
-		{
-			System.err.println("NOT BOUND !!!!");
-		}
-	}
-
-	protected void onServiceBind()
-	{
-
-	}
-
-	protected void onServiceUnbind()
-	{
-
-	}
-
-
-	/**
-	 * Defines callbacks for service binding, passed to bindService()
-	 */
-	private class CryptocatServiceConnection implements ServiceConnection
-	{
-
-		@Override
-		public void onServiceConnected(ComponentName className,
-		                               IBinder service)
-		{
-			// We've bound to LocalService, cast the IBinder and get LocalService instance
-			CryptocatService.CryptocatBinder binder = (CryptocatService.CryptocatBinder) service;
-			BoundFragment.this.service = binder.getService();
-			bound = true;
-
-			onServiceBind();
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0)
-		{
-			bound = false;
-		}
-	}
-
-
 	//=============
 	// Callback stuff
 
@@ -119,6 +45,12 @@ public class BoundFragment extends Fragment
 		// Reset the active callbacks interface to the dummy implementation.
 		callbacks = sDummyCallbacks;
 	}
+
+	protected CryptocatService getService()
+	{
+		return CryptocatService.getInstance();
+	}
+
 
 	/**
 	 * A callback interface that all activities containing this fragment must

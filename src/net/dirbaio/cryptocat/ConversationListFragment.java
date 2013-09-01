@@ -49,21 +49,23 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	}
 
 	@Override
-	protected void onServiceBind()
+	public void onResume()
 	{
-		service.addStateListener(this);
-		service.getConversationList(conversations);
+		super.onResume();
+		getService().addStateListener(this);
+		getService().getConversationList(conversations);
 		conversationArrayAdapter = new ConversationAdapter(getAltContext(), R.layout.item_conversation, conversations);
 		setListAdapter(conversationArrayAdapter);
-		service.addStateListener(this);
+		getService().addStateListener(this);
 
 		setActivateOnItemClick(true);
 	}
 
 	@Override
-	protected void onServiceUnbind()
+	public void onPause()
 	{
-		service.removeStateListener(this);
+		super.onPause();
+		getService().removeStateListener(this);
 	}
 
 	@Override
@@ -82,7 +84,7 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	@Override
 	public void stateChanged()
 	{
-		service.getConversationList(conversations);
+		getService().getConversationList(conversations);
 		conversationArrayAdapter.notifyDataSetChanged();
 	}
 
