@@ -69,6 +69,12 @@ public class MainActivity extends SherlockFragmentActivity
 			selectedConversation = savedInstanceState.getString(STATE_SELECTED_CONVERSATION);
 			selectedBuddy = savedInstanceState.getString(STATE_SELECTED_BUDDY);
 		}
+		else
+		{
+			//If opening the app when already connected, show conversation list.
+			if(CryptocatService.getInstance() != null && CryptocatService.getInstance().hasServers())
+				sm.showMenu(false);
+		}
 
 		//Create conversation list
 		conversationList = new ConversationListFragment();
