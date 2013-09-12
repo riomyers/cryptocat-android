@@ -179,7 +179,8 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	}
 	public void setSelectedItem(String server, String conversation, String buddy)
 	{
-		setSelection(getPositionFor(server, conversation, buddy));
+		if(getView() != null)
+			setSelection(getPositionFor(server, conversation, buddy));
 	}
 
 	private class ConversationAdapter extends ArrayAdapter<Object>

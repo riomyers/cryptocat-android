@@ -1,15 +1,19 @@
 package net.dirbaio.cryptocat;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import net.dirbaio.cryptocat.service.CryptocatService;
 
-public class MainActivity extends SherlockFragmentActivity
-		implements ConversationListFragment.Callbacks
+public class MainActivity extends SherlockFragmentActivity implements ConversationListFragment.Callbacks
 {
 
 	public static final String ARG_SERVER_ID = "net.dirbaio.cryptocat.SERVER_ID";
@@ -27,6 +31,9 @@ public class MainActivity extends SherlockFragmentActivity
 	private ConversationListFragment conversationList;
 	private String selectedServer, selectedConversation, selectedBuddy;
 
+	private boolean bound = false;
+	private Handler handler;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -34,6 +41,8 @@ public class MainActivity extends SherlockFragmentActivity
 
 		//Start the service if it isn't already started.
 		startService(new Intent(this, CryptocatService.class));
+
+		handler = new Handler();
 
 		//Main content view
 		setContentView(R.layout.frame_conversation_detail);
@@ -76,10 +85,6 @@ public class MainActivity extends SherlockFragmentActivity
 				sm.showMenu(false);
 		}
 
-		//Create conversation list
-		conversationList = new ConversationListFragment();
-		setConversationListFragment(conversationList);
-
 		getSupportActionBar().setTitle("Cryptocat");
 
 		// TODO: If exposing deep links into your app, handle intents here.
@@ -90,8 +95,20 @@ public class MainActivity extends SherlockFragmentActivity
 	{
 		super.onResume();
 
-		//All done, now set contents!
-		selectItem(selectedServer, selectedConversation, selectedBuddy);
+		//Bind to the service.
+		//This is only useful to ensure the service is started when we use it.
+		//All communication with the service is done via CryptocatService.getInstance()
+		Intent intent = new Intent(this, CryptocatService.class);
+		bindService(intent, connection, Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+
+		if(bound)
+			unbindService(connection);
 	}
 
 	private void setFragment(int id, Fragment fragment)
@@ -177,4 +194,38 @@ public class MainActivity extends SherlockFragmentActivity
 		fragment2.setArguments(arguments);
 		setBuddyListFragment(fragment2);
 	}
+
+	private ServiceConnection connection = new ServiceConnection()
+	{
+
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			bound = true;
+
+			//It's important to create the conversation list before calling selectItem()
+
+
+			handler.post(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					//Create conversation list
+					conversationList = new ConversationListFragment();
+					setConversationListFragment(conversationList);
+
+					//All done, service is started, now set contents!
+					selectItem(selectedServer, selectedConversation, selectedBuddy);
+				}
+			});
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+			bound = false;
+			//This is not supposed to happen unless we manually disconnect
+			//from the service (I think).
+
+		}
+	};
 }
