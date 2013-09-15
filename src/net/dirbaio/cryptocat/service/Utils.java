@@ -4,6 +4,7 @@
  */
 package net.dirbaio.cryptocat.service;
 
+import android.os.Looper;
 import org.jivesoftware.smack.util.Base64;
 
 import java.math.BigInteger;
@@ -26,5 +27,11 @@ public class Utils
 	public static String toBase64(byte[] binary)
 	{
 		return Base64.encodeBytes(binary, Base64.DONT_BREAK_LINES);
+	}
+
+	public static void assertUiThread()
+	{
+		if (Looper.getMainLooper().getThread() != Thread.currentThread())
+			throw new RuntimeException("Not on UI Thread!");
 	}
 }

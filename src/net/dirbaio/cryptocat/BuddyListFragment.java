@@ -54,21 +54,20 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 		buddyArrayAdapter = new BuddyAdapter(getAltContext(), R.layout.item_buddy, conversation.buddies);
 		setListAdapter(buddyArrayAdapter);
 
-		conversation.addBuddyListener(BuddyListFragment.this);
+		conversation.addBuddyListener(this);
 	}
 
 	@Override
 	public void onPause()
 	{
 		super.onPause();
-		conversation.removeBuddyListener(BuddyListFragment.this);
+		conversation.removeBuddyListener(this);
 	}
 
 	@Override
 	public void buddyListChanged()
 	{
 		buddyArrayAdapter.notifyDataSetChanged();
-
 	}
 
 	@Override

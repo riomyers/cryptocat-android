@@ -34,6 +34,7 @@ public abstract class Conversation
 
 	public Conversation(CryptocatServer server, String nickname) throws XMPPException
 	{
+		Utils.assertUiThread();
 		this.server = server;
 		this.nickname = nickname;
 		this.state = State.Left;
@@ -41,6 +42,7 @@ public abstract class Conversation
 
 	public final State getState()
 	{
+		Utils.assertUiThread();
 		return state;
 	}
 
@@ -51,20 +53,24 @@ public abstract class Conversation
 
 	public final void addMessageListener(CryptocatMessageListener l)
 	{
+		Utils.assertUiThread();
 		msgListeners.add(l);
 	}
 
 	public final void removeMessageListener(CryptocatMessageListener l)
 	{
+		Utils.assertUiThread();
 		msgListeners.remove(l);
 	}
 
 	protected void addMessage(CryptocatMessage msg)
 	{
-		for (CryptocatMessageListener l : msgListeners)
-			l.messageReceived(msg);
+		Utils.assertUiThread();
 
 		history.add(msg);
+
+		for (CryptocatMessageListener l : msgListeners)
+			l.messageReceived(msg);
 	}
 
 }

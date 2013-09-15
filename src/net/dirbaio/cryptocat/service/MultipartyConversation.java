@@ -51,6 +51,8 @@ public class MultipartyConversation extends Conversation
 
 	public void join() throws XMPPException
 	{
+		Utils.assertUiThread();
+
 		if (state != State.Left)
 			throw new IllegalStateException("You're already joined.");
 		if (server.getState() != CryptocatServer.State.Connected)
@@ -155,6 +157,8 @@ public class MultipartyConversation extends Conversation
 
 	public void leave()
 	{
+		Utils.assertUiThread();
+
 		if (state != State.Joined)
 			throw new IllegalStateException("You have not joined.");
 
@@ -183,11 +187,13 @@ public class MultipartyConversation extends Conversation
 
 	public void addBuddyListener(CryptocatBuddyListener l)
 	{
+		Utils.assertUiThread();
 		buddyListeners.add(l);
 	}
 
 	public void removeBuddyListener(CryptocatBuddyListener l)
 	{
+		Utils.assertUiThread();
 		buddyListeners.remove(l);
 	}
 
@@ -357,12 +363,15 @@ public class MultipartyConversation extends Conversation
 
 	private void notifyBuddyListChange()
 	{
+		Utils.assertUiThread();
 		for (CryptocatBuddyListener l : buddyListeners)
 			l.buddyListChanged();
 	}
 
 	public void sendMessage(String message) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException
 	{
+		Utils.assertUiThread();
+
 		//Check state
 		if (state != State.Joined)
 			throw new IllegalStateException("You have not joined.");
