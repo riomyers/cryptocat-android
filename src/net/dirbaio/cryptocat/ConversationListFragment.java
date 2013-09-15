@@ -8,9 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import net.dirbaio.cryptocat.service.MultipartyConversation;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import net.dirbaio.cryptocat.service.CryptocatServer;
 import net.dirbaio.cryptocat.service.CryptocatStateListener;
+import net.dirbaio.cryptocat.service.MultipartyConversation;
 import net.dirbaio.cryptocat.service.OtrConversation;
 
 import java.util.ArrayList;
@@ -46,6 +50,19 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	 */
 	public ConversationListFragment()
 	{
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+	{
+		inflater.inflate(R.menu.conversation_list_menu, menu);
 	}
 
 	@Override
@@ -211,6 +228,23 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 		}
 	}
 
+	@Override
+	protected void onMustUpdateTitle(ActionBar ab)
+	{
+		ab.setTitle("Cryptocat");
+		ab.setSubtitle(null);
+	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case R.id.newserver:
+				callbacks.onItemSelected(null, null, null);
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 }
 

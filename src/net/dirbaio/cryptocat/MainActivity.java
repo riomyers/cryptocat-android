@@ -9,11 +9,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import net.dirbaio.cryptocat.service.CryptocatService;
 
-public class MainActivity extends SherlockFragmentActivity implements ConversationListFragment.Callbacks
+public class MainActivity extends SherlockFragmentActivity implements BoundFragment.Callbacks, SlidingMenu.OnOpenListener, SlidingMenu.OnCloseListener
 {
 
 	public static final String ARG_SERVER_ID = "net.dirbaio.cryptocat.SERVER_ID";
@@ -28,6 +30,7 @@ public class MainActivity extends SherlockFragmentActivity implements Conversati
 	private SlidingMenu sm;
 
 	public BoundFragment currFragment;
+	public BoundFragment currSideFragment;
 	private ConversationListFragment conversationList;
 	private String selectedServer, selectedConversation, selectedBuddy;
 
@@ -66,6 +69,10 @@ public class MainActivity extends SherlockFragmentActivity implements Conversati
 		//SlidingMenu right view (user list)
 		sm.setSecondaryMenu(R.layout.frame_buddy_list);
 
+		sm.setOnOpenListener(this);
+		sm.setOnCloseListener(this);
+		sm.setSecondaryOnOpenListner(this)
+		;
 		//Restore instance state.
 		if(savedInstanceState != null)
 		{
@@ -85,11 +92,19 @@ public class MainActivity extends SherlockFragmentActivity implements Conversati
 				sm.showMenu(false);
 		}
 
-		getSupportActionBar().setTitle("Cryptocat");
+		ActionBar ab = getSupportActionBar();
+		ab.setTitle("Cryptocat");
 
 		// TODO: If exposing deep links into your app, handle intents here.
 	}
-
+/*
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getSupportMenuInflater().inflate(R.menu.conversation_menu, menu);
+		return true;
+	}
+*/
 	@Override
 	protected void onResume()
 	{
@@ -113,7 +128,7 @@ public class MainActivity extends SherlockFragmentActivity implements Conversati
 
 	private void setFragment(int id, Fragment fragment)
 	{
-		FragmentTransaction t = this.getSupportFragmentManager().beginTransaction();
+		FragmentTransaction t = getSupportFragmentManager().beginTransaction();
 		t.replace(id, fragment);
 		t.commit();
 	}
@@ -155,6 +170,24 @@ public class MainActivity extends SherlockFragmentActivity implements Conversati
 		sm.showContent();
 	}
 
+	@Override
+	public void showMenu()
+	{
+		sm.showMenu();
+	}
+
+	@Override
+	public void showSecondaryMenu()
+	{
+		sm.showSecondaryMenu();
+	}
+
+	@Override
+	public void showContent()
+	{
+		sm.showContent();
+	}
+
 	public void selectItem(String server, String conversation, String buddy)
 	{
 		selectedServer = server;
@@ -171,7 +204,7 @@ public class MainActivity extends SherlockFragmentActivity implements Conversati
 		arguments.putString(ARG_CONVERSATION_ID, conversation);
 		arguments.putString(ARG_BUDDY_ID, buddy);
 		BoundFragment fragment;
-		Fragment fragment2;
+		BoundFragment fragment2;
 
 		if (server != null && conversation != null)
 		{
@@ -191,8 +224,11 @@ public class MainActivity extends SherlockFragmentActivity implements Conversati
 		fragment.setArguments(arguments);
 		setConversationFragment(fragment);
 
+		currSideFragment = fragment2;
 		fragment2.setArguments(arguments);
 		setBuddyListFragment(fragment2);
+
+		updateFragmentVisibility();
 	}
 
 	private ServiceConnection connection = new ServiceConnection()
@@ -228,4 +264,45 @@ public class MainActivity extends SherlockFragmentActivity implements Conversati
 
 		}
 	};
+
+	@Override
+	public void onOpen()
+	{
+		updateFragmentVisibility();
+	}
+
+	@Override
+	public void onClose()
+	{
+		updateFragmentVisibility();
+	}
+
+	private void updateFragmentVisibility()
+	{
+		if(conversationList == null || currFragment == null)
+			return;
+
+		boolean menuShown = sm.isMenuShowing() && !sm.isSecondaryMenuShowing();
+
+		conversationList.setSelected(menuShown);
+		currFragment.setSelected(!menuShown);
+
+		ActionBar ab = getSupportActionBar();
+		ab.setDisplayHomeAsUpEnabled(!menuShown);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch(item.getItemId())
+		{
+			case android.R.id.home:
+				if(sm.isSecondaryMenuShowing())
+					sm.showContent();
+				else
+					sm.showMenu();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 }

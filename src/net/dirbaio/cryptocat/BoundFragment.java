@@ -1,17 +1,15 @@
 package net.dirbaio.cryptocat;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.support.v4.app.Fragment;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import net.dirbaio.cryptocat.service.CryptocatService;
 
-public class BoundFragment extends Fragment
+public class BoundFragment extends SherlockFragment
 {
 	//=============
 	// Callback stuff
@@ -63,6 +61,10 @@ public class BoundFragment extends Fragment
 		 * Callback for when an item has been selected.
 		 */
 		public void onItemSelected(String server, String conversation, String buddy);
+
+		public void showMenu();
+		public void showSecondaryMenu();
+		public void showContent();
 	}
 
 	/**
@@ -75,11 +77,46 @@ public class BoundFragment extends Fragment
 		public void onItemSelected(String server, String conversation, String buddy)
 		{
 		}
+
+		@Override
+		public void showMenu()
+		{
+		}
+
+		@Override
+		public void showSecondaryMenu()
+		{
+		}
+
+		@Override
+		public void showContent()
+		{
+		}
 	};
 
 
-	//Title stuff
-	public void updateTitle()
+	//Title and menu stuff
+	//============
+
+	private boolean selected = false;
+	public void setSelected(boolean selected)
+	{
+		this.selected = selected;
+		setMenuVisibility(selected);
+		updateTitle();
+	}
+
+	protected final void updateTitle()
+	{
+		if(selected && getActivity() != null)
+		{
+			ActionBar ab = ((SherlockFragmentActivity)getActivity()).getSupportActionBar();
+			if(ab != null)
+				onMustUpdateTitle(ab);
+		}
+	}
+
+	protected void onMustUpdateTitle(ActionBar ab)
 	{
 
 	}

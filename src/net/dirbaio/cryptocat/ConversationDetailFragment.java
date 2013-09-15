@@ -6,7 +6,10 @@ import android.view.*;
 import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.*;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import net.dirbaio.cryptocat.service.*;
 
 import java.util.ArrayList;
@@ -41,6 +44,8 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	{
 		super.onCreate(savedInstanceState);
 
+		setHasOptionsMenu(true);
+
 		serverId = getArguments().getString(MainActivity.ARG_SERVER_ID);
 		conversationId = getArguments().getString(MainActivity.ARG_CONVERSATION_ID);
 		buddyId = getArguments().getString(MainActivity.ARG_BUDDY_ID);
@@ -52,12 +57,18 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 		super.onStart();
 	}
 
-    public void updateTitle()
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+	{
+		System.err.println("onCreateOptionsMenu CALLED!");
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.conversation_menu, menu);
+	}
+
+	@Override
+	protected void onMustUpdateTitle(ActionBar ab)
 	{
 		if(conversation == null) return;
-		if(getActivity() == null) return;
-
-		ActionBar ab = ((SherlockFragmentActivity)getActivity()).getSupportActionBar();
 
 		if(conversation instanceof MultipartyConversation)
 		{
@@ -223,7 +234,7 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 					case Message:
 						txt = item.text;
 						background = me?R.drawable.bubble_rev:R.drawable.bubble;
-						gravity = me?Gravity.RIGHT:Gravity.LEFT;
+						gravity = me ? Gravity.RIGHT:Gravity.LEFT;
 						break;
 					case Join:
 						txt = item.nickname + " joined";
@@ -254,5 +265,17 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 
 			return view;
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case R.id.buddies:
+				callbacks.showSecondaryMenu();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }

@@ -6,9 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import net.dirbaio.cryptocat.service.MultipartyConversation;
+import com.actionbarsherlock.app.ActionBar;
 import net.dirbaio.cryptocat.service.CryptocatServer;
 import net.dirbaio.cryptocat.service.CryptocatStateListener;
+import net.dirbaio.cryptocat.service.MultipartyConversation;
 import org.jivesoftware.smack.XMPPException;
 
 public class ServerDetailFragment extends BoundFragment implements CryptocatStateListener
@@ -54,6 +55,7 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 		server = getService().getServer(serverId);
 		server.addStateListener(this);
 		stateChanged();
+		updateTitle();
 	}
 
 	@Override
@@ -102,5 +104,12 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 			}
 		});
 		return rootView;
+	}
+
+	@Override
+	protected void onMustUpdateTitle(ActionBar ab)
+	{
+		ab.setTitle("Join chat room");
+		ab.setSubtitle(server.server);
 	}
 }
