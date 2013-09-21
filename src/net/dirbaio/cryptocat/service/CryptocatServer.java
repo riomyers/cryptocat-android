@@ -9,6 +9,8 @@ import net.dirbaio.cryptocat.ExceptionRunnable;
 import org.jivesoftware.smack.*;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,7 +18,7 @@ public class CryptocatServer
 {
 	public final String id;
 	public final String server, conferenceServer;
-	public final int port;
+	public final String boshRelay;
 
 	public final HashMap<String, MultipartyConversation> conversations = new HashMap<>();
 	private final ArrayList<CryptocatStateListener> listeners = new ArrayList<>();
@@ -40,12 +42,12 @@ public class CryptocatServer
 		return state;
 	}
 
-	public CryptocatServer(String server, String conferenceServer, int port)
+	public CryptocatServer(String server, String conferenceServer, String boshRelay)
 	{
 		this.id = server;
 		this.server = server;
 		this.conferenceServer = conferenceServer;
-		this.port = port;
+		this.boshRelay = boshRelay;
 		this.state = State.Disconnected;
 	}
 
@@ -61,7 +63,24 @@ public class CryptocatServer
 		SmackConfiguration.setLocalSocks5ProxyEnabled(false);
 
 		//Setup connection
-		final ConnectionConfiguration config = new ConnectionConfiguration(server, port);
+		URI uri = null;
+		try
+		{
+			uri = new URI(boshRelay);
+		}
+		catch (URISyntaxException e)
+		{
+			throw new IllegalArgumentException(e);
+		}
+		if(!uri.getScheme().equals("https"))
+			throw new IllegalArgumentException("BOSH relay must be HTTPS.");
+
+		int port = uri.getPort();
+		if(port == -1)
+			port = 443;
+
+		final BOSHConfiguration config = new BOSHConfiguration(true, uri.getHost(), port, uri.getPath(), server);
+		config.setUsedHostAddress(config.getHostAddresses().get(0)); //I have no idea what this is either.
 
 		//Android trust store shenaniagans
 		//This is still broken :(
@@ -91,8 +110,7 @@ public class CryptocatServer
 				try
 				{
 					// Connect to the server
-					con = new XMPPConnection(config);
-
+					con = new BOSHConnection(config);
 					con.connect();
 					con.addConnectionListener(new ConnectionListener()
 					{
