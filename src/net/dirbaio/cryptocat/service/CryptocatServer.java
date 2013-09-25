@@ -24,7 +24,7 @@ public class CryptocatServer
 	private final ArrayList<CryptocatStateListener> listeners = new ArrayList<>();
 
 	private String username, password;
-	Connection con;
+	BOSHConnection con;
 
 	private State state;
 
@@ -72,12 +72,18 @@ public class CryptocatServer
 		{
 			throw new IllegalArgumentException(e);
 		}
-		if(!uri.getScheme().equals("https"))
-			throw new IllegalArgumentException("BOSH relay must be HTTPS.");
+
+		int defaultPort = -1;
+		if(uri.getScheme().equals("https"))
+			defaultPort = 443;
+		else if(uri.getScheme().equals("http"))
+			defaultPort = 80;
+		else
+			throw new IllegalArgumentException("BOSH relay must be HTTP or HTTPS.");
 
 		int port = uri.getPort();
 		if(port == -1)
-			port = 443;
+			port = defaultPort;
 
 		final BOSHConfiguration config = new BOSHConfiguration(true, uri.getHost(), port, uri.getPath(), server);
 		config.setUsedHostAddress(config.getHostAddresses().get(0)); //I have no idea what this is either.
