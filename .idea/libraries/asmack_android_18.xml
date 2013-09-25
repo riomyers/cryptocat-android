@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="asmack-android-18">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/asmack-android-18.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/asmack-android-18-source.jar!/" />
+    </SOURCES>
+  </library>
+</component>
