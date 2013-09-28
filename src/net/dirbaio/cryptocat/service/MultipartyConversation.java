@@ -78,7 +78,7 @@ public class MultipartyConversation extends Conversation
 				try
 				{
 					//Setup MUC chat
-					muc = new MultiUserChat(server.con, roomName + "@" + server.conferenceServer);
+					muc = new MultiUserChat(server.con, roomName + "@" + server.config.conferenceServer);
 
 					muc.addMessageListener(new PacketListener()
 					{

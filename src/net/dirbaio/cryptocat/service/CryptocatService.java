@@ -118,9 +118,9 @@ public class CryptocatService extends Service implements CryptocatStateListener
 
 	//CryptocatServer stuff.
 
-	public CryptocatServer createServer(String server, String conferenceServer, String boshRelay)
+	public CryptocatServer createServer(CryptocatServerConfig config)
 	{
-		CryptocatServer s = new CryptocatServer(server, conferenceServer, boshRelay);
+		CryptocatServer s = new CryptocatServer(config);
 		if(servers.containsKey(s.id))
 			throw new AlreadyConnectedException();
 		servers.put(s.id, s);

@@ -3,10 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/deps/ActionBarSherlock.iml" filepath="$PROJECT_DIR$/deps/ActionBarSherlock.iml" />
-      <module fileurl="file://$USER_HOME$/ActionBarSherlock/ActionBarSherlock.iml" filepath="$USER_HOME$/ActionBarSherlock/ActionBarSherlock.iml" />
       <module fileurl="file://$PROJECT_DIR$/Cryptocat.iml" filepath="$PROJECT_DIR$/Cryptocat.iml" />
       <module fileurl="file://$PROJECT_DIR$/deps/SlidingMenu.iml" filepath="$PROJECT_DIR$/deps/SlidingMenu.iml" />
-      <module fileurl="file://$USER_HOME$/SlidingMenu/SlidingMenu.iml" filepath="$USER_HOME$/SlidingMenu/SlidingMenu.iml" />
     </modules>
   </component>
 </project>

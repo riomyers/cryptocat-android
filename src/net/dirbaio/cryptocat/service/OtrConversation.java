@@ -54,7 +54,7 @@ public class OtrConversation extends Conversation implements MessageListener
 				try
 				{
 					server.notifyStateChanged();
-					chat = parent.muc.createPrivateChat(parent.roomName +"@"+parent.server.conferenceServer+"/"+buddyNickname, OtrConversation.this);
+					chat = parent.muc.createPrivateChat(parent.roomName +"@"+parent.server.config.conferenceServer+"/"+buddyNickname, OtrConversation.this);
 
 					state = State.Joined;
 					server.notifyStateChanged();

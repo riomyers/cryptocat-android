@@ -17,14 +17,13 @@ import java.util.HashMap;
 public class CryptocatServer
 {
 	public final String id;
-	public final String server, conferenceServer;
-	public final String boshRelay;
+	public final CryptocatServerConfig config;
 
 	public final HashMap<String, MultipartyConversation> conversations = new HashMap<>();
 	private final ArrayList<CryptocatStateListener> listeners = new ArrayList<>();
 
 	private String username, password;
-	BOSHConnection con;
+	Connection con;
 
 	private State state;
 
@@ -42,12 +41,10 @@ public class CryptocatServer
 		return state;
 	}
 
-	public CryptocatServer(String server, String conferenceServer, String boshRelay)
+	public CryptocatServer(CryptocatServerConfig config)
 	{
-		this.id = server;
-		this.server = server;
-		this.conferenceServer = conferenceServer;
-		this.boshRelay = boshRelay;
+		this.id = config.server;
+		this.config = config;
 		this.state = State.Disconnected;
 	}
 
@@ -62,51 +59,62 @@ public class CryptocatServer
 		//No idea wtf this is
 		SmackConfiguration.setLocalSocks5ProxyEnabled(false);
 
-		//Setup connection
-		URI uri = null;
-		try
+		ConnectionConfiguration conConfig;
+		if(config.useBosh)
 		{
-			uri = new URI(boshRelay);
+			//Setup connection
+			URI uri = null;
+			try
+			{
+				uri = new URI(config.boshRelay);
+			}
+			catch (URISyntaxException e)
+			{
+				throw new IllegalArgumentException(e);
+			}
+	
+			int defaultPort = -1;
+			if(uri.getScheme().equals("https"))
+				defaultPort = 443;
+			else if(uri.getScheme().equals("http"))
+				defaultPort = 80;
+			else
+				throw new IllegalArgumentException("BOSH relay must be HTTP or HTTPS.");
+	
+			int port = uri.getPort();
+			if(port == -1)
+				port = defaultPort;
+	
+			BOSHConfiguration boshConfig = new BOSHConfiguration(true, uri.getHost(), port, uri.getPath(), config.server);
+			boshConfig.setUsedHostAddress(boshConfig.getHostAddresses().get(0)); //I have no idea what this is either.
+			
+			conConfig = boshConfig;
 		}
-		catch (URISyntaxException e)
-		{
-			throw new IllegalArgumentException(e);
-		}
-
-		int defaultPort = -1;
-		if(uri.getScheme().equals("https"))
-			defaultPort = 443;
-		else if(uri.getScheme().equals("http"))
-			defaultPort = 80;
 		else
-			throw new IllegalArgumentException("BOSH relay must be HTTP or HTTPS.");
-
-		int port = uri.getPort();
-		if(port == -1)
-			port = defaultPort;
-
-		final BOSHConfiguration config = new BOSHConfiguration(true, uri.getHost(), port, uri.getPath(), server);
-		config.setUsedHostAddress(config.getHostAddresses().get(0)); //I have no idea what this is either.
-
+			conConfig = new ConnectionConfiguration(config.server, config.port);
+		
+		
 		//Android trust store shenaniagans
 		//This is still broken :(
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
-			config.setTruststoreType("AndroidCAStore");
-			config.setTruststorePassword(null);
-			config.setTruststorePath(null);
+			conConfig.setTruststoreType("AndroidCAStore");
+			conConfig.setTruststorePassword(null);
+			conConfig.setTruststorePath(null);
 		}
 		else
 		{
-			config.setTruststoreType("BKS");
+			conConfig.setTruststoreType("BKS");
 			String path = System.getProperty("javax.net.ssl.trustStore");
 			if (path == null)
 				path = System.getProperty("java.home") + File.separator + "etc"
 						+ File.separator + "security" + File.separator
 						+ "cacerts.bks";
 			System.err.println("Trust path: " + path);
-			config.setTruststorePath(path);
+			conConfig.setTruststorePath(path);
 		}
+
+		final ConnectionConfiguration conConfigFinal = conConfig;
 
 		CryptocatService.getInstance().post(new ExceptionRunnable()
 		{
@@ -116,7 +124,10 @@ public class CryptocatServer
 				try
 				{
 					// Connect to the server
-					con = new BOSHConnection(config);
+					if(config.useBosh)
+						con = new BOSHConnection((BOSHConfiguration)conConfigFinal);
+					else
+						con = new XMPPConnection(conConfigFinal);
 					con.connect();
 					con.addConnectionListener(new ConnectionListener()
 					{

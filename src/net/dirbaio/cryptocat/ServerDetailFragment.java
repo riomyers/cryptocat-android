@@ -110,6 +110,6 @@ public class ServerDetailFragment extends BoundFragment implements CryptocatStat
 	protected void onMustUpdateTitle(ActionBar ab)
 	{
 		ab.setTitle("Join chat room");
-		ab.setSubtitle(server.server);
+		ab.setSubtitle(server.config.server);
 	}
 }
