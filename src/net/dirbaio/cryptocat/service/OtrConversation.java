@@ -1,6 +1,9 @@
 package net.dirbaio.cryptocat.service;
 
 import net.dirbaio.cryptocat.ExceptionRunnable;
+import net.java.otr4j.OtrEngineHost;
+import net.java.otr4j.OtrPolicy;
+import net.java.otr4j.session.SessionID;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
@@ -11,20 +14,19 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 
 /**
  * An OTR conversation.
  * TODO: Actually use OTR. (lol)
  */
-public class OtrConversation extends Conversation implements MessageListener
+public class OtrConversation extends Conversation implements MessageListener, OtrEngineHost
 {
 	public final String buddyNickname;
 	public final MultipartyConversation parent;
 	Chat chat;
+
+    private OtrPolicy policy;
 
 	public OtrConversation(MultipartyConversation parent, String buddyNickname) throws XMPPException
 	{
@@ -100,15 +102,6 @@ public class OtrConversation extends Conversation implements MessageListener
 		if (getState() != State.Joined)
 			throw new IllegalStateException("You have not joined.");
 
-		CryptocatService.getInstance().post(new ExceptionRunnable()
-		{
-			@Override
-			public void run() throws Exception
-			{
-				chat.sendMessage(msg);
-			}
-		});
-
 		addMessage(new CryptocatMessage(CryptocatMessage.Type.Message, nickname, msg));
 	}
 
@@ -132,4 +125,49 @@ public class OtrConversation extends Conversation implements MessageListener
 		return "[" + state + "] " + parent.roomName +":"+buddyNickname;
 	}
 
+    public void sendRawMessage(final String msg)
+    {
+        CryptocatService.getInstance().post(new ExceptionRunnable()
+        {
+            @Override
+            public void run() throws Exception
+            {
+                chat.sendMessage(msg);
+            }
+        });
+    }
+
+
+    @Override
+    public void injectMessage(SessionID sessionID, String s) {
+        sendRawMessage(s);
+    }
+
+    @Override
+    public void showWarning(SessionID sessionID, String s) {
+        System.err.println("OTR WARNING: "+s);
+    }
+
+    @Override
+    public void showError(SessionID sessionID, String s) {
+        System.err.println("OTR ERROR: "+s);
+    }
+
+    @Override
+    public OtrPolicy getSessionPolicy(SessionID sessionID) {
+        return policy;
+    }
+
+    @Override
+    public KeyPair getKeyPair(SessionID sessionID) {
+        KeyPairGenerator kg;
+        try {
+            kg = KeyPairGenerator.getInstance("DSA");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return kg.genKeyPair();
+    }
 }
