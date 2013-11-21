@@ -115,7 +115,17 @@ public class MultipartyConversation extends Conversation
 										String from = getNickname(p.getFrom());
 
 										if (p.getType() == Presence.Type.available)
+                                        {
+                                            //Add buddy to list
+                                            Buddy b = new Buddy(from);
+                                            buddiesByName.put(from, b);
+                                            buddies.add(b);
+                                            notifyBuddyListChange();
+                                            addMessage(new CryptocatMessage(CryptocatMessage.Type.Join, from, null));
+
+                                            //Send him my priv key
 											sendPublicKey(from);
+                                        }
 										if (p.getType() == Presence.Type.unavailable)
 										{
 											//FIXME: This is broken, it doesn't get called. aSmack bug?
@@ -278,15 +288,13 @@ public class MultipartyConversation extends Conversation
 		{
 			case PUBLIC_KEY:
 			{
-				if (buddiesByName.containsKey(from))
+				if (!buddiesByName.containsKey(from))
 					return;
 
 				byte[] hisPublicKey = myMessage.message;
-				Buddy b = new Buddy(from, hisPublicKey);
-				buddiesByName.put(from, b);
-				buddies.add(b);
-				notifyBuddyListChange();
-				addMessage(new CryptocatMessage(CryptocatMessage.Type.Join, from, null));
+                Buddy b = buddiesByName.get(from);
+                b.setPublicKey(hisPublicKey);
+                notifyBuddyListChange();
 				break;
 			}
 			case PUBLIC_KEY_REQUEST:
@@ -386,11 +394,22 @@ public class MultipartyConversation extends Conversation
 		plaintext = Arrays.copyOf(plaintext, plaintext.length + 64);
 		System.arraycopy(randomPad, 0, plaintext, plaintext.length - 64, 64);
 
+        //Sort all recipients
+        ArrayList<String> sortedRecipients = new ArrayList<>();
+
+        for (Buddy b : buddiesByName.values())
+            if(b.hasPublicKey())
+                sortedRecipients.add(b.nickname);
+
+        Collections.sort(sortedRecipients);
+
 		//Encrypt
 		JsonMessage m = new JsonMessage();
 
 		for (Buddy b : buddiesByName.values())
 		{
+            if(!b.hasPublicKey()) continue;
+
 			//Create IV
 			byte[] iv2 = new byte[12];
 			Utils.random.nextBytes(iv2);
@@ -406,13 +425,12 @@ public class MultipartyConversation extends Conversation
 			m.text.put(b.nickname, e);
 		}
 
-		//Sort recipients
-		ArrayList<String> sortedRecipients = new ArrayList<>(buddiesByName.keySet());
-		Collections.sort(sortedRecipients);
 
 		//HMAC
 		for (Buddy b : buddiesByName.values())
 		{
+            if(!b.hasPublicKey()) continue;
+
 			SecretKeySpec secretKey = new SecretKeySpec(b.hmacSecret, "HmacSHA512");
 			Mac mac = Mac.getInstance("HmacSHA512");
 			mac.init(secretKey);
@@ -455,31 +473,43 @@ public class MultipartyConversation extends Conversation
 	{
 
 		public final String nickname;
-		private final byte[] publicKey;
-		private final byte[] messageSecret, hmacSecret;
+		private byte[] publicKey;
+		private byte[] messageSecret, hmacSecret;
 
-		private Buddy(String nickname, byte[] publicKey) throws InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchProviderException
+		private Buddy(String nickname)
 		{
 			this.nickname = nickname;
-			this.publicKey = publicKey;
-
-			//Gen shared secret
-			byte[] curve = new byte[32];
-			Curve25519.curve(curve, privateKey, publicKey);
-
-			//Gen secrets
-			MessageDigest mda = MessageDigest.getInstance("SHA-512", "BC");
-			byte[] digest = mda.digest(curve);
-
-			messageSecret = new byte[32];
-			hmacSecret = new byte[32];
-
-			System.arraycopy(digest, 0, messageSecret, 0, 32);
-			System.arraycopy(digest, 32, hmacSecret, 0, 32);
 		}
+
+        public boolean hasPublicKey()
+        {
+            return publicKey != null;
+        }
+
+        public void setPublicKey(byte[] publicKey) throws NoSuchProviderException, NoSuchAlgorithmException {
+            System.err.println("Received pubkey from "+nickname);
+            this.publicKey = publicKey;
+
+            //Gen shared secret
+            byte[] curve = new byte[32];
+            Curve25519.curve(curve, privateKey, publicKey);
+
+            //Gen secrets
+            MessageDigest mda = MessageDigest.getInstance("SHA-512", "BC");
+            byte[] digest = mda.digest(curve);
+
+            messageSecret = new byte[32];
+            hmacSecret = new byte[32];
+
+            System.arraycopy(digest, 0, messageSecret, 0, 32);
+            System.arraycopy(digest, 32, hmacSecret, 0, 32);
+        }
 
 		private byte[] encryptAes(byte[] plaintext, byte[] iv) throws InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException
 		{
+            if(!hasPublicKey())
+                throw new RuntimeException("Buddy hasn't sent public key yet");
+
 			Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
 
 			SecretKeySpec key = new SecretKeySpec(messageSecret, "AES");
@@ -495,6 +525,9 @@ public class MultipartyConversation extends Conversation
 
 		private byte[] decryptAes(byte[] plaintext, byte[] iv) throws InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException
 		{
+            if(!hasPublicKey())
+                throw new RuntimeException("Buddy hasn't sent public key yet");
+
 			Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
 
 			SecretKeySpec key = new SecretKeySpec(messageSecret, "AES");
