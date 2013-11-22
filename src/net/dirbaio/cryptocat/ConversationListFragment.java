@@ -235,7 +235,9 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 
 			Object item = getItem(position);
 			TextView textView = (TextView) view.findViewById(R.id.text);
-			textView.setText(item.toString());
+            System.err.println("GetView "+conversation+" "+item);
+            String str = item.toString();
+            textView.setText(str);
 
 			return view;
 		}

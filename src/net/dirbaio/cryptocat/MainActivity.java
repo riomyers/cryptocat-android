@@ -29,8 +29,8 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 
 	private SlidingMenu sm;
 
-	public BoundFragment currFragment;
-	public BoundFragment currSideFragment;
+	public BoundFragment currCenterFragment;
+	public BoundFragment currRightFragment;
 	private ConversationListFragment conversationList;
 	private String selectedServer, selectedConversation, selectedBuddy;
 
@@ -133,18 +133,21 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 		t.commit();
 	}
 
-	private void setConversationFragment(Fragment fragment)
+
+    private void setLeftFragment(BoundFragment fragment)
+    {
+        setFragment(R.id.conversation_list_container, fragment);
+    }
+
+    private void setCenterFragment(BoundFragment fragment)
 	{
+        currCenterFragment = fragment;
 		setFragment(R.id.conversation_detail_container, fragment);
 	}
 
-	private void setConversationListFragment(Fragment fragment)
+	private void setRightFragment(BoundFragment fragment)
 	{
-		setFragment(R.id.conversation_list_container, fragment);
-	}
-
-	private void setBuddyListFragment(Fragment fragment)
-	{
+        currRightFragment = fragment;
 		setFragment(R.id.buddy_list_container, fragment);
 	}
 
@@ -203,30 +206,31 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 		arguments.putString(ARG_SERVER_ID, server);
 		arguments.putString(ARG_CONVERSATION_ID, conversation);
 		arguments.putString(ARG_BUDDY_ID, buddy);
-		BoundFragment fragment;
-		BoundFragment fragment2;
+
+		BoundFragment centerFragment;
+		BoundFragment rightFragment;
 
 		if (server != null && conversation != null)
 		{
-			fragment = new ConversationDetailFragment();
-			fragment2 = new ConversationListFragment();
+			centerFragment = new ConversationDetailFragment();
+			rightFragment = new ConversationListFragment();
 		}
 		else
 		{
-			fragment2 = new CreditsFragment();
+			rightFragment = new CreditsFragment();
 			if (server != null)
-				fragment = new ServerDetailFragment();
+				centerFragment = new ServerDetailFragment();
 			else
-				fragment = new JoinServerFragment();
+				centerFragment = new JoinServerFragment();
 		}
 
-		currFragment = fragment;
-		fragment.setArguments(arguments);
-		setConversationFragment(fragment);
+		currCenterFragment = centerFragment;
+		centerFragment.setArguments(arguments);
+		setCenterFragment(centerFragment);
 
-		currSideFragment = fragment2;
-		fragment2.setArguments(arguments);
-		setBuddyListFragment(fragment2);
+		currRightFragment = rightFragment;
+		rightFragment.setArguments(arguments);
+		setRightFragment(rightFragment);
 
 		updateFragmentVisibility();
 	}
@@ -240,7 +244,6 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 
 			//It's important to create the conversation list before calling selectItem()
 
-
 			handler.post(new Runnable()
 			{
 				@Override
@@ -248,7 +251,7 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 				{
 					//Create conversation list
 					conversationList = new ConversationListFragment();
-					setConversationListFragment(conversationList);
+					setLeftFragment(conversationList);
 
 					//All done, service is started, now set contents!
 					selectItem(selectedServer, selectedConversation, selectedBuddy);
@@ -279,13 +282,13 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 
 	private void updateFragmentVisibility()
 	{
-		if(conversationList == null || currFragment == null)
+		if(conversationList == null || currCenterFragment == null)
 			return;
 
 		boolean menuShown = sm.isMenuShowing() && !sm.isSecondaryMenuShowing();
 
 		conversationList.setSelected(menuShown);
-		currFragment.setSelected(!menuShown);
+		currCenterFragment.setSelected(!menuShown);
 
 		ActionBar ab = getSupportActionBar();
 		ab.setDisplayHomeAsUpEnabled(!menuShown);

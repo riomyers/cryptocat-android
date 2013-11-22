@@ -464,9 +464,9 @@ public class MultipartyConversation extends Conversation
 		private byte[] messageSecret, hmacSecret;
 		private OtrConversation conv;
 
-		private Buddy(String nickname)
-		{
+		private Buddy(String nickname) throws XMPPException {
 			this.nickname = nickname;
+            startPrivateConversation();
 		}
 
         public boolean hasPublicKey()
@@ -491,8 +491,6 @@ public class MultipartyConversation extends Conversation
 
             System.arraycopy(digest, 0, messageSecret, 0, 32);
             System.arraycopy(digest, 32, hmacSecret, 0, 32);
-
-			startPrivateConversation();
 		}
 
 		private byte[] encryptAes(byte[] plaintext, byte[] iv) throws InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException
