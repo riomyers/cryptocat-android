@@ -1,5 +1,6 @@
 package net.dirbaio.cryptocat.service;
 
+import net.java.otr4j.OtrException;
 import org.jivesoftware.smack.XMPPException;
 
 import javax.crypto.BadPaddingException;
@@ -48,7 +49,7 @@ public abstract class Conversation
 
 	public abstract void join() throws XMPPException;
 	public abstract void leave();
-	public abstract void sendMessage(String msg) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException;
+	public abstract void sendMessage(String msg) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException, OtrException;
 
 
 	public final void addMessageListener(CryptocatMessageListener l)

@@ -241,11 +241,21 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 						background = R.drawable.bubble_notif;
 						gravity = Gravity.CENTER;
 						break;
-					case Leave:
-						txt = item.nickname + " left";
-						background = R.drawable.bubble_notif;
-						gravity = Gravity.CENTER;
-						break;
+                    case Leave:
+                        txt = item.nickname + " left";
+                        background = R.drawable.bubble_notif;
+                        gravity = Gravity.CENTER;
+                        break;
+                    case File:
+                        txt = item.nickname + " sent a file";
+                        background = R.drawable.bubble_notif;
+                        gravity = Gravity.CENTER;
+                        break;
+                    case Error:
+                        txt = "ERROR: "+item.text;
+                        background = R.drawable.bubble_notif;
+                        gravity = Gravity.CENTER;
+                        break;
 					default:
 						throw new IllegalStateException("Unknown item type");
 				}

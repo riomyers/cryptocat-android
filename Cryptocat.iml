@@ -20,7 +20,7 @@
     <orderEntry type="library" name="android-support-v42" level="project" />
     <orderEntry type="module" module-name="ActionBarSherlock" />
     <orderEntry type="module" module-name="SlidingMenu" />
-    <orderEntry type="library" name="otr4j-0.9" level="project" />
+    <orderEntry type="module" module-name="otr4j" />
   </component>
 </module>
 

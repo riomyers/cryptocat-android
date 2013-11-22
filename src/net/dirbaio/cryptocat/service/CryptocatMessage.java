@@ -31,6 +31,8 @@ public class CryptocatMessage
 	{
 		Message,
 		Join,
-		Leave
+		Leave,
+        File,
+        Error
 	}
 }

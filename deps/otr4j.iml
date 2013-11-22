@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="android" name="Android">
+      <configuration>
+        <option name="GEN_FOLDER_RELATIVE_PATH_APT" value="/otr4j/gen" />
+        <option name="GEN_FOLDER_RELATIVE_PATH_AIDL" value="/otr4j/gen" />
+        <option name="MANIFEST_FILE_RELATIVE_PATH" value="/otr4j/AndroidManifest.xml" />
+        <option name="RES_FOLDER_RELATIVE_PATH" value="/otr4j/res" />
+        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/otr4j/assets" />
+        <option name="LIBS_FOLDER_RELATIVE_PATH" value="/otr4j/libs" />
+        <option name="LIBRARY_PROJECT" value="true" />
+        <option name="UPDATE_PROPERTY_FILES" value="true" />
+        <resOverlayFolders>
+          <path>/otr4j/res-overlay</path>
+        </resOverlayFolders>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/otr4j">
+      <sourceFolder url="file://$MODULE_DIR$/otr4j/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/otr4j/gen" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="Android 4.3 Platform" jdkType="Android SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="sc-light-jdk15on-1.47.0.2" level="project" />
+  </component>
+</module>
+
