@@ -209,7 +209,7 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 		if (server != null && conversation != null)
 		{
 			fragment = new ConversationDetailFragment();
-			fragment2 = new BuddyListFragment();
+			fragment2 = new ConversationListFragment();
 		}
 		else
 		{

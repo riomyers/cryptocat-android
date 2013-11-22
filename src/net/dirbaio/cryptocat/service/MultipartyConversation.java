@@ -1,6 +1,7 @@
 package net.dirbaio.cryptocat.service;
 
 import net.dirbaio.cryptocat.ExceptionRunnable;
+import net.java.otr4j.OtrException;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
@@ -34,11 +35,10 @@ public class MultipartyConversation extends Conversation
 
 	public byte[] privateKey;
 	public byte[] publicKey;
+
 	public final Map<String, Buddy> buddiesByName = new HashMap<>();
 	public final ArrayList<Buddy> buddies = new ArrayList<>();
-	public final Map<String, OtrConversation> privateConversations = new HashMap<>();
 
-	private final HashMap<String, OtrConversation> privateConversationsByNick = new HashMap<>();
 	private final ArrayList<CryptocatBuddyListener> buddyListeners = new ArrayList<>();
 
 
@@ -49,7 +49,7 @@ public class MultipartyConversation extends Conversation
 		this.id = roomName;
 	}
 
-	public void join() throws XMPPException
+	public void join()
 	{
 		Utils.assertUiThread();
 
@@ -172,8 +172,8 @@ public class MultipartyConversation extends Conversation
 		if (state != State.Joined)
 			throw new IllegalStateException("You have not joined.");
 
-		for(OtrConversation c : privateConversations.values())
-			c.leave();
+		for(Buddy b : buddies)
+			b.getConversation().leave();
 
 		final MultiUserChat mucFinal = muc;
 
@@ -207,31 +207,9 @@ public class MultipartyConversation extends Conversation
 		buddyListeners.remove(l);
 	}
 
-	public OtrConversation startPrivateConversation(String buddyNickname) throws XMPPException
-	{
-		if (state != State.Joined)
-			throw new IllegalStateException("You're not joined to the chatroom.");
-		if (server.getState() == CryptocatServer.State.Disconnected)
-			throw new IllegalStateException("Server is not connected");
-
-		//Don't create the conversation again.
-		OtrConversation conv = privateConversationsByNick.get(buddyNickname);
-		if(conv != null)
-			return conv;
-
-		conv = new OtrConversation(this, buddyNickname);
-		privateConversations.put(conv.id, conv);
-		privateConversationsByNick.put(buddyNickname, conv);
-
-		conv.join();
-
-		server.notifyStateChanged();
-		return conv;
-	}
-
 	public OtrConversation getPrivateConversation(String id)
 	{
-		return privateConversations.get(id);
+		return buddiesByName.get(id).getConversation();
 	}
 
 	@Override
@@ -376,8 +354,7 @@ public class MultipartyConversation extends Conversation
 			l.buddyListChanged();
 	}
 
-	public void sendMessage(String message) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException
-	{
+	public void sendMessage(String message) throws OtrException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, NoSuchPaddingException, BadPaddingException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, UnsupportedEncodingException {
 		Utils.assertUiThread();
 
 		//Check state
@@ -468,6 +445,16 @@ public class MultipartyConversation extends Conversation
 		addMessage(msg);
 	}
 
+	public void getPrivateConversationList(ArrayList<Object> conversations)
+	{
+		conversations.clear();
+
+		conversations.add(this);
+
+		for(Buddy b : buddies)
+			conversations.add(b.getConversation());
+	}
+
 
 	public class Buddy
 	{
@@ -475,6 +462,7 @@ public class MultipartyConversation extends Conversation
 		public final String nickname;
 		private byte[] publicKey;
 		private byte[] messageSecret, hmacSecret;
+		private OtrConversation conv;
 
 		private Buddy(String nickname)
 		{
@@ -486,7 +474,7 @@ public class MultipartyConversation extends Conversation
             return publicKey != null;
         }
 
-        public void setPublicKey(byte[] publicKey) throws NoSuchProviderException, NoSuchAlgorithmException {
+        public void setPublicKey(byte[] publicKey) throws NoSuchProviderException, NoSuchAlgorithmException, XMPPException {
             System.err.println("Received pubkey from "+nickname);
             this.publicKey = publicKey;
 
@@ -503,7 +491,9 @@ public class MultipartyConversation extends Conversation
 
             System.arraycopy(digest, 0, messageSecret, 0, 32);
             System.arraycopy(digest, 32, hmacSecret, 0, 32);
-        }
+
+			startPrivateConversation();
+		}
 
 		private byte[] encryptAes(byte[] plaintext, byte[] iv) throws InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchPaddingException, NoSuchAlgorithmException
 		{
@@ -545,6 +535,26 @@ public class MultipartyConversation extends Conversation
 		public String toString()
 		{
 			return nickname;
+		}
+
+
+		private void startPrivateConversation() throws XMPPException {
+			if (state != State.Joined)
+				throw new IllegalStateException("You're not joined to the chatroom.");
+			if (server.getState() == CryptocatServer.State.Disconnected)
+				throw new IllegalStateException("Server is not connected");
+			if(conv != null)
+				throw new IllegalStateException("Conversation already started");
+
+			conv = new OtrConversation(MultipartyConversation.this, nickname);
+			conv.join();
+
+			server.notifyStateChanged();
+		}
+
+		public OtrConversation getConversation()
+		{
+			return conv;
 		}
 	}
 

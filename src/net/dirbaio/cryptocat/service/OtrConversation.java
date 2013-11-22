@@ -33,7 +33,7 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
 	}
 
 	@Override
-	public void join() throws XMPPException
+	public void join()
 	{
 		if (state != State.Left)
 			throw new IllegalStateException("You're already joined.");

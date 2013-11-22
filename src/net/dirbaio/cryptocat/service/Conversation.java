@@ -33,7 +33,7 @@ public abstract class Conversation
 		Error
 	}
 
-	public Conversation(CryptocatServer server, String nickname) throws XMPPException
+	public Conversation(CryptocatServer server, String nickname)
 	{
 		Utils.assertUiThread();
 		this.server = server;
@@ -47,10 +47,9 @@ public abstract class Conversation
 		return state;
 	}
 
-	public abstract void join() throws XMPPException;
+	public abstract void join();
 	public abstract void leave();
-	public abstract void sendMessage(String msg) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException, OtrException;
-
+	public abstract void sendMessage(String msg) throws OtrException, UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException, OtrException;
 
 	public final void addMessageListener(CryptocatMessageListener l)
 	{

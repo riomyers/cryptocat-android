@@ -153,11 +153,7 @@ public class CryptocatService extends Service implements CryptocatStateListener
 		{
 			list.add(s);
 			for (MultipartyConversation c : s.conversations.values())
-			{
 				list.add(c);
-				for(OtrConversation o : c.privateConversations.values())
-					list.add(o);
-			}
 		}
 	}
 
