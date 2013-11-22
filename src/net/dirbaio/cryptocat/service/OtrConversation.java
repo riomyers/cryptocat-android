@@ -26,7 +26,7 @@ public class OtrConversation extends Conversation implements MessageListener
 	public final MultipartyConversation parent;
 	Chat chat;
 
-	public OtrConversation(MultipartyConversation parent, String buddyNickname) throws XMPPException
+	public OtrConversation(MultipartyConversation parent, String buddyNickname)
 	{
 		super(parent.server, parent.nickname);
 		this.parent = parent;
@@ -35,7 +35,7 @@ public class OtrConversation extends Conversation implements MessageListener
 	}
 
 	@Override
-	public void join() throws XMPPException
+	public void join()
 	{
 		if (state != State.Left)
 			throw new IllegalStateException("You're already joined.");
@@ -94,7 +94,7 @@ public class OtrConversation extends Conversation implements MessageListener
 
 	//TODO Actual OTR implementation.
 	@Override
-	public void sendMessage(final String msg) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, XMPPException, NoSuchPaddingException
+	public void sendMessage(final String msg) throws UnsupportedEncodingException, InvalidKeyException, InvalidAlgorithmParameterException, ShortBufferException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException
 	{
 		//Check state
 		if (getState() != State.Joined)

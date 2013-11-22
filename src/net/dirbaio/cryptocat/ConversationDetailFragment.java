@@ -60,7 +60,6 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		System.err.println("onCreateOptionsMenu CALLED!");
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.conversation_menu, menu);
 	}

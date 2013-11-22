@@ -77,6 +77,7 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 
 		MultipartyConversation.Buddy b = buddyArrayAdapter.getItem(position);
 
+		/*
 		try
 		{
 			OtrConversation o = conversation.startPrivateConversation(b.nickname);
@@ -85,7 +86,7 @@ public class BuddyListFragment extends BoundListFragment implements CryptocatBud
 		catch (XMPPException e)
 		{
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	private class BuddyAdapter extends ArrayAdapter<MultipartyConversation.Buddy>

@@ -44,6 +44,8 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	private final ArrayList<Object> conversations = new ArrayList<Object>();
 	private ArrayAdapter<Object> conversationArrayAdapter;
 
+	private MultipartyConversation conversation;
+
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
@@ -57,6 +59,15 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	{
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+
+		if(getArguments() != null)
+		{
+			String serverId = getArguments().getString(MainActivity.ARG_SERVER_ID);
+			String conversationId = getArguments().getString(MainActivity.ARG_CONVERSATION_ID);
+
+			if(serverId != null)
+				conversation = getService().getServer(serverId).getConversation(conversationId);
+		}
 	}
 
 	@Override
@@ -70,10 +81,11 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 	{
 		super.onResume();
 		getService().addStateListener(this);
-		getService().getConversationList(conversations);
 		conversationArrayAdapter = new ConversationAdapter(getAltContext(), R.layout.item_conversation, conversations);
 		setListAdapter(conversationArrayAdapter);
+
 		getService().addStateListener(this);
+		stateChanged(); //Fire initial update.
 
 		setActivateOnItemClick(true);
 	}
@@ -91,17 +103,18 @@ public class ConversationListFragment extends BoundListFragment implements Crypt
 		super.onViewCreated(view, savedInstanceState);
 
 		// Restore the previously serialized activated item position.
-		if (savedInstanceState != null
-				&& savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
-		{
+		if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION))
 			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-		}
 	}
 
 	@Override
 	public void stateChanged()
 	{
-		getService().getConversationList(conversations);
+		if(conversation != null)
+			conversation.getPrivateConversationList(conversations);
+		else
+			getService().getConversationList(conversations);
+
 		conversationArrayAdapter.notifyDataSetChanged();
 	}
 
