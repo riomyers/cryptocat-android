@@ -69,7 +69,12 @@ You will need:
 4. Go to File -> Project Structure
 5. If you see "Module SDK: Android Platform [invalid]", click New -> Android SDK
 6. Choose the location of the Java and/or Android SDKs when asked.
-7. You should be good to go now!
+7. Go to Run -> Edit Configurations
+8. Click the "+" icon, then choose "Android Application"
+9. Select Module "Cryptocat"
+10. Choose whether you want to launch on emulator or USB device
+11. Click OK.
+12. Now you can compile and run Cryptocat from the IDE! Congratulations! :3
 
 Awesome libraries used
 ---
