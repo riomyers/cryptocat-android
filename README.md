@@ -45,14 +45,39 @@ Known bugs (they will get fixed!)
 How to build
 ---
 
-It's an IntelliJ IDEA project. Not sure how much luck you will have using it with other IDEs. (I tried to make it as a Maven project but failed miserably. Help on that would be highly welcome)
+You will need: 
+* Java JDK 1.7 or older
+* Android SDK
+* IntelliJ Idea (any edition will work)
+* Git
 
-It requires a few libs:
+1. Clone the repo
+
+```
+    git clone git@github.com/Dirbaio/Cryptocat-Android
+```
+
+2. Init and update submodules
+
+```
+    cd Cryptocat-Android
+    git submodule init
+    git submodule update
+```
+
+3. Open the project in IntelliJ IDEA
+4. Go to File -> Project Structure
+5. If you see "Module SDK: Android Platform [invalid]", click New -> Android SDK
+6. Choose the location of the Java and/or Android SDKs when asked.
+7. You should be good to go now!
+
+Awesome libraries used
+---
 * [ActionBarSherlock](http://actionbarsherlock.com)
 * [SlidingMenu](https://github.com/jfeinstein10/SlidingMenu)
 * [aSmack](https://github.com/flowdalic/asmack)
 * [Google Gson](https://code.google.com/p/google-gson/)
+* [SpongyCastle](http://rtyley.github.io/spongycastle/)
+* [otr4j](https://code.google.com/p/otr4j/) (Modified to use SpongyCastle instead of BouncyCastle)
 * Android Support v4
-
-If you include these libs as modules and then add them as dependancies on the Cryptocat module everything should build fine.
 
