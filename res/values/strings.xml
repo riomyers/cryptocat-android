@@ -15,5 +15,11 @@
     <string name="reconnect">Reconnect</string>
     <string name="welcome">Welcome to Cryptocat!</string>
     <string name="connect_to_cryptocat">Get chatting!</string>
+    <string name="about_cryptocat">Cryptocat credits go here</string>
+    <string name="about_cryptocat_2">Cryptocat is awesome and lets you chat with privacy. Made by the awesome Cryptocat
+        team. Android app made by me :3
+    </string>
+    <string name="cryptocat">Cryptocat</string>
+    <string name="version">Version</string>
 
 </resources>

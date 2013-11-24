@@ -125,7 +125,7 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		rootView = inflater.inflate(R.layout.fragment_conversation_detail, container, false);
+		rootView = inflater.inflate(R.layout.fragment_conversation, container, false);
 
 		conversationView = (ListView) rootView.findViewById(R.id.conversation);
 		conversationView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);

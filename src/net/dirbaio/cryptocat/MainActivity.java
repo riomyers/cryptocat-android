@@ -48,7 +48,7 @@ public class MainActivity extends SherlockFragmentActivity implements BaseFragme
 		handler = new Handler();
 
 		//Main content view
-		setContentView(R.layout.frame_conversation_detail);
+		setContentView(R.layout.frame_center);
 
 		// customize the SlidingMenu
 		sm = new SlidingMenu(this);
@@ -64,10 +64,10 @@ public class MainActivity extends SherlockFragmentActivity implements BaseFragme
 		sm.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 
 		//SlidingMenu left view (conversation list)
-		sm.setMenu(R.layout.frame_conversation_list);
+		sm.setMenu(R.layout.frame_left);
 
 		//SlidingMenu right view (user list)
-		sm.setSecondaryMenu(R.layout.frame_buddy_list);
+		sm.setSecondaryMenu(R.layout.frame_right);
 
 		sm.setOnOpenListener(this);
 		sm.setOnCloseListener(this);
@@ -136,19 +136,19 @@ public class MainActivity extends SherlockFragmentActivity implements BaseFragme
 
     private void setLeftFragment(BaseFragment fragment)
     {
-        setFragment(R.id.conversation_list_container, fragment);
+        setFragment(R.id.left_container, fragment);
     }
 
     private void setCenterFragment(BaseFragment fragment)
 	{
         currCenterFragment = fragment;
-		setFragment(R.id.conversation_detail_container, fragment);
+		setFragment(R.id.center_container, fragment);
 	}
 
 	private void setRightFragment(BaseFragment fragment)
 	{
         currRightFragment = fragment;
-		setFragment(R.id.buddy_list_container, fragment);
+		setFragment(R.id.right_container, fragment);
 	}
 
 	@Override
@@ -217,7 +217,7 @@ public class MainActivity extends SherlockFragmentActivity implements BaseFragme
 		}
 		else
 		{
-			rightFragment = new CreditsFragment();
+			rightFragment = new AboutFragment();
 			if (server != null)
 				centerFragment = new ServerDetailFragment();
 			else

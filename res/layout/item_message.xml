@@ -2,7 +2,7 @@
 
 <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="3dp" android:baselineAligned="false" android:id="@+id/bubble_parent">
     <LinearLayout
@@ -16,10 +16,8 @@
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New Text"
                 android:id="@+id/nickname" android:layout_gravity="center|left" android:textStyle="bold"/>
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                  android:text="AREASOFGASNDAISNFGAS"
                   android:id="@+id/text" android:layout_gravity="center|left"/>
     </LinearLayout>
 </FrameLayout>

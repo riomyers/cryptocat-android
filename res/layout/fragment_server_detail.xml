@@ -6,8 +6,8 @@
 
     <LinearLayout
             android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" android:id="@+id/join">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" android:id="@+id/join">
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
                 android:text="@string/nickname"
                 android:id="@+id/textView1" android:layout_gravity="center"/>
         <EditText
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/nickname" android:inputType="textAutoCorrect"/>
         <TextView
@@ -28,7 +28,7 @@
                 android:text="@string/room_name"
                 android:id="@+id/textView" android:layout_gravity="center"/>
         <EditText
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/name" android:inputType="textAutoCorrect"/>
         <Button
@@ -39,8 +39,8 @@
     </LinearLayout>
     <LinearLayout
             android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" android:id="@+id/connecting">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" android:id="@+id/connecting">
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -53,8 +53,8 @@
     </LinearLayout>
     <LinearLayout
             android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" android:id="@+id/not_connected">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" android:id="@+id/not_connected">
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

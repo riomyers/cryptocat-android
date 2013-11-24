@@ -125,7 +125,7 @@ public class BaseFragment extends SherlockFragment
     // (Used to make the side fragments have the dark theme
     //================
 
-	private Context altContext;
+	private static Context altContext;
 	protected Context getAltContext()
 	{
 		if(altContext == null)
