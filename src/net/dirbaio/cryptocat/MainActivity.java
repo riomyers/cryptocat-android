@@ -308,4 +308,14 @@ public class MainActivity extends SherlockFragmentActivity implements BaseFragme
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
+    @Override
+    public void onBackPressed() {
+        if(sm.isSecondaryMenuShowing())
+            showContent();
+        else if(!sm.isMenuShowing())
+            showMenu();
+        else
+            super.onBackPressed();
+    }
 }
