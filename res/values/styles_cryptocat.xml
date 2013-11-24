@@ -33,12 +33,12 @@
                 <!-- Light.DarkActionBar specific -->
         <item name="actionBarWidgetTheme">@style/Theme.Cryptocat.Widget</item>
 
-        <item name="android:windowBackground">@color/bg_light</item>
+        <item name="android:windowBackground">@color/bg_med</item>
     </style>
 
 
     <style name="SlidingMenu" parent="@android:style/Theme.Holo">
-        <item name="android:background">@color/sidebar_bg</item>
+        <item name="android:windowBackground">@color/sidebar_bg</item>
         <item name="android:textColor">@color/sidebar_text</item>
     </style>
 

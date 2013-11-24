@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:padding="3dp"
+	android:baselineAligned="false"
+	android:id="@+id/bubble_parent">
+
+	<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/bubble"
+		android:baselineAligned="true"
+		android:layout_weight="0.0"
+		android:gravity="right"
+		android:layout_gravity="center"
+		android:background="@drawable/bubble_join">
+
+		<ImageView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/imageView"
+			android:layout_gravity="center"
+			android:layout_weight="0.0"
+			android:background="@drawable/bubble_join_icon"/>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
+			android:id="@+id/nickname"
+			android:textStyle="bold"
+			android:layout_weight="1.0"
+			android:layout_marginLeft="8dp"
+			android:textColor="#FFFFFFFF"
+			android:singleLine="false"/>
+
+	</LinearLayout>
+</FrameLayout>

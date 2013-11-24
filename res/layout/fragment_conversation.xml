@@ -1,35 +1,53 @@
 <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-    <ListView
-            android:id="@+id/conversation" android:layout_width="match_parent"
-            android:layout_height="match_parent" android:textIsSelectable="true"
-            android:layout_weight="1.0" android:focusable="false" android:focusableInTouchMode="false"
-            android:autoLink="email|web" android:linksClickable="true" android:stackFromBottom="true"
-            android:dividerHeight="0dp"
-            android:divider="@null"/>
-    <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:layout_gravity="fill_horizontal"
-            style="@style/ConversationBottom">
-        <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:hint="@string/saysomething"
-                android:id="@+id/text" android:phoneNumber="false" android:password="false"
-                android:layout_gravity="center" android:layout_margin="3dp" android:inputType="textShortMessage|text|textMultiLine|textCapSentences|textAutoCorrect"
-                android:imeOptions="actionSend">
-            <requestFocus/>
-        </EditText>
-        <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="0.0"
-                android:id="@+id/send"
-                android:src="@drawable/ic_send"
-                android:background="@drawable/button_bg" android:padding="5dp"/>
-    </LinearLayout>
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<net.dirbaio.cryptocat.ConversationListView
+		android:id="@+id/conversation"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:textIsSelectable="true"
+		android:layout_weight="1.0"
+		android:focusable="false"
+		android:focusableInTouchMode="false"
+		android:autoLink="email|web"
+		android:linksClickable="true"
+		android:stackFromBottom="true"
+		android:dividerHeight="0dp"
+		android:divider="@null"/>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="fill_horizontal"
+		style="@style/ConversationBottom">
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:hint="@string/saysomething"
+			android:id="@+id/text"
+			android:phoneNumber="false"
+			android:password="false"
+			android:layout_gravity="center"
+			android:layout_margin="3dp"
+			android:inputType="textShortMessage|text|textMultiLine|textCapSentences|textAutoCorrect"
+			android:imeOptions="actionSend">
+
+			<requestFocus/>
+		</EditText>
+
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_weight="0.0"
+			android:id="@+id/send"
+			android:src="@drawable/ic_send"
+			android:background="@drawable/button_bg"
+			android:padding="5dp"/>
+	</LinearLayout>
 </LinearLayout>

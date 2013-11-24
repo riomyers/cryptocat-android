@@ -25,7 +25,7 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 	private Conversation conversation;
 
 	private ArrayAdapter<CryptocatMessage> conversationArrayAdapter;
-	private ListView conversationView;
+	private ConversationListView conversationView;
 	private View rootView;
 	private ImageButton sendButton;
 	private EditText text;
@@ -99,7 +99,7 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 		if(buddyId != null)
 			conversation = ((MultipartyConversation)conversation).getPrivateConversation(buddyId);
 
-		conversationArrayAdapter = new ConversationAdapter(getActivity(), R.layout.item_message, conversation.history);
+		conversationArrayAdapter = new ConversationAdapter(getActivity(), conversation.history);
 		conversationView.setAdapter(conversationArrayAdapter);
 
 		conversation.addMessageListener(ConversationFragment.this);
@@ -127,7 +127,7 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 	{
 		rootView = inflater.inflate(R.layout.fragment_conversation, container, false);
 
-		conversationView = (ListView) rootView.findViewById(R.id.conversation);
+		conversationView = (ConversationListView) rootView.findViewById(R.id.conversation);
 		conversationView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
 		sendButton = (ImageButton) rootView.findViewById(R.id.send);
@@ -184,92 +184,68 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 
 		private Context context;
 
-		public ConversationAdapter(Context context, int textViewResourceId, ArrayList<CryptocatMessage> items)
+		public ConversationAdapter(Context context, ArrayList<CryptocatMessage> items)
 		{
-			super(context, textViewResourceId, items);
+			super(context, 0, items);
 			this.context = context;
 		}
 
-		public View getView(int position, View convertView, ViewGroup parent)
+        @Override
+        public int getViewTypeCount() {
+            return CryptocatMessage.Type.values().length;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return getItem(position).type.ordinal();
+        }
+
+        public View getView(int position, View view, ViewGroup parent)
 		{
-			View view = convertView;
+            CryptocatMessage msg = getItem(position);
+
 			if (view == null)
 			{
 				LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.item_message, null);
+
+                int id;
+
+                switch (msg.type)
+                {
+                    case Message:       id = R.layout.message; break;
+                    case MessageMine:   id = R.layout.message_mine; break;
+                    case Join:          id = R.layout.message_join; break;
+                    case Leave:         id = R.layout.message_leave; break;
+                    case File:          id = R.layout.message_error; break;
+                    case Error:         id = R.layout.message_error; break;
+                    default: throw new IllegalStateException("Unknown item type");
+                }
+
+                view = inflater.inflate(id, null);
 			}
 
-			CryptocatMessage item = getItem(position);
+            boolean showNick = true;
 
-			if (item != null)
-			{
-				boolean me = item.nickname.equals(conversation.nickname);
+            if(msg.type == CryptocatMessage.Type.Message && position != 0)
+            {
+                CryptocatMessage prevMsg = getItem(position-1);
+                if(prevMsg.type == CryptocatMessage.Type.Message && prevMsg.nickname.equals(msg.nickname))
+                    showNick = false;
+            }
 
-				boolean showNick = false;
+            if(msg.type != CryptocatMessage.Type.Error && msg.type != CryptocatMessage.Type.MessageMine)
+            {
+                TextView nickView = (TextView) view.findViewById(R.id.nickname);
+                nickView.setVisibility(showNick?View.VISIBLE:View.GONE);
+                nickView.setText(msg.nickname);
+            }
 
-				if(!me &&
-						item.t == CryptocatMessage.Type.Message &&
-						conversation instanceof MultipartyConversation &&
-						(position == 0 || !getItem(position-1).nickname.equals(item.nickname)))
-					showNick = true;
+            if(msg.type != CryptocatMessage.Type.Join && msg.type != CryptocatMessage.Type.Leave)
+            {
+                TextView textView = (TextView) view.findViewById(R.id.text);
+                textView.setText(msg.text);
+            }
 
-				TextView nickView = (TextView) view.findViewById(R.id.nickname);
-				if(showNick)
-				{
-					nickView.setText(item.nickname);
-					nickView.setVisibility(View.VISIBLE);
-				}
-				else
-					nickView.setVisibility(View.GONE);
-
-
-				String txt;
-				int background;
-				int gravity;
-
-				switch (item.t)
-				{
-					case Message:
-						txt = item.text;
-						background = me?R.drawable.bubble_rev:R.drawable.bubble;
-						gravity = me ? Gravity.RIGHT:Gravity.LEFT;
-						break;
-					case Join:
-						txt = item.nickname + " joined";
-						background = R.drawable.bubble_join;
-						gravity = Gravity.CENTER;
-						break;
-                    case Leave:
-                        txt = item.nickname + " left";
-                        background = R.drawable.bubble_leave;
-                        gravity = Gravity.CENTER;
-                        break;
-                    case File:
-                        txt = item.nickname + " sent a file";
-                        background = R.drawable.bubble_join;
-                        gravity = Gravity.CENTER;
-                        break;
-                    case Error:
-                        txt = item.text;
-                        background = R.drawable.bubble_error;
-                        gravity = Gravity.CENTER;
-                        break;
-					default:
-						throw new IllegalStateException("Unknown item type");
-				}
-
-				TextView textView = (TextView) view.findViewById(R.id.text);
-				textView.setText(txt);
-
-				View bubbleView = view.findViewById(R.id.bubble);
-				bubbleView.setBackgroundResource(background);
-
-				FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-						FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-				params.gravity = gravity;
-
-				bubbleView.setLayoutParams(params);
-			}
 
 			return view;
 		}

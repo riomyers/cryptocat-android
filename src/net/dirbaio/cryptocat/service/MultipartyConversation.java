@@ -439,7 +439,7 @@ public class MultipartyConversation extends Conversation
 		sendJsonMessage(m);
 
 		//Once done, send to listeners and save to history
-		CryptocatMessage msg = new CryptocatMessage(CryptocatMessage.Type.Message, nickname, message);
+		CryptocatMessage msg = new CryptocatMessage(CryptocatMessage.Type.MessageMine, nickname, message);
 
 		addMessage(msg);
 	}

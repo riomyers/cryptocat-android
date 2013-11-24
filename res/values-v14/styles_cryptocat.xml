@@ -32,7 +32,7 @@
         
                 <!-- Light.DarkActionBar specific -->
         <item name="android:actionBarWidgetTheme">@style/Theme.Cryptocat.Widget</item>
-        <item name="android:windowBackground">@color/bg_light</item>
+        <item name="android:windowBackground">@color/bg_med</item>
     </style>
 
     <style name="ActionBar.Solid.Cryptocat" parent="@style/Widget.Sherlock.Light.ActionBar.Solid.Inverse">

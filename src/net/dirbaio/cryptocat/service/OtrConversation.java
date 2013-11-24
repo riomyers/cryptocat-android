@@ -103,7 +103,7 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
         }
         else
         {
-            addMessage(new CryptocatMessage(CryptocatMessage.Type.Message, nickname, msg));
+            addMessage(new CryptocatMessage(CryptocatMessage.Type.MessageMine, nickname, msg));
             sendRawMessage(otrEngine.transformSending(otrSessionID, msg));
         }
 	}
