@@ -33,35 +33,17 @@
                 <!-- Light.DarkActionBar specific -->
         <item name="actionBarWidgetTheme">@style/Theme.Cryptocat.Widget</item>
 
-        <item name="android:windowBackground">@color/bg_med</item>
+        <item name="android:windowBackground">@color/bg_light</item>
     </style>
 
 
     <style name="SlidingMenu" parent="@android:style/Theme.Holo">
-    </style>
-
-    <style name="SlidingMenuFrame">
-        <item name="android:background">#151520</item>
-    </style>
-
-    <style name="Bubble">
-        <item name="android:background">@drawable/bubble</item>
-        <item name="android:gravity">left</item>
-        <item name="android:showDividers">none</item>
-    </style>
-
-    <style name="BubbleRev" parent="@style/Bubble">
-        <item name="android:background">@drawable/bubble_rev</item>
-        <item name="android:gravity">right</item>
-    </style>
-
-    <style name="BubbleNotif" parent="@style/Bubble">
-        <item name="android:background">@drawable/bubble_rev</item>
-        <item name="android:gravity">center</item>
+        <item name="android:background">@color/sidebar_bg</item>
+        <item name="android:textColor">@color/sidebar_text</item>
     </style>
 
     <style name="ConversationBottom">
-        <item name="android:background">@drawable/bottom</item>
+        <item name="android:background">@color/bg_med</item>
     </style>
 
     <style name="ActionBar.Solid.Cryptocat" parent="@style/Widget.Sherlock.Light.ActionBar.Solid.Inverse">

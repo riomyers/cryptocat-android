@@ -116,6 +116,9 @@ public class MultipartyConversation extends Conversation
 
 										if (p.getType() == Presence.Type.available)
                                         {
+                                            if(from.equals(nickname))
+                                                return;
+
                                             //Add buddy to list
                                             Buddy b = new Buddy(from);
                                             buddiesByName.put(from, b);

@@ -6,4 +6,7 @@
     <color name="bg_actionbar">#FF153b50</color>
     <color name="border_light">#FF76BDE5</color>
     <color name="clicked">#FF40a8e3</color>
+
+    <color name="sidebar_bg">#FF151520</color>
+    <color name="sidebar_text">#FFC7E5F5</color>
 </resources>
