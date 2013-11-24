@@ -6,7 +6,6 @@ import android.view.*;
 import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.*;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
  * A fragment representing a single Conversation screen.
  * This fragment is contained in a {@link MainActivity}
  */
-public class ConversationDetailFragment extends BoundFragment implements CryptocatMessageListener, CryptocatBuddyListener
+public class ConversationFragment extends BaseFragment implements CryptocatMessageListener, CryptocatBuddyListener
 {
 	private String serverId;
 	private String conversationId;
@@ -35,7 +34,7 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	 * Mandatory empty constructor for the fragment manager to instantiate the
 	 * fragment (e.g. upon screen orientation changes).
 	 */
-	public ConversationDetailFragment()
+	public ConversationFragment()
 	{
 	}
 
@@ -103,9 +102,9 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 		conversationArrayAdapter = new ConversationAdapter(getActivity(), R.layout.item_message, conversation.history);
 		conversationView.setAdapter(conversationArrayAdapter);
 
-		conversation.addMessageListener(ConversationDetailFragment.this);
+		conversation.addMessageListener(ConversationFragment.this);
 		if(conversation instanceof MultipartyConversation)
-			((MultipartyConversation)conversation).addBuddyListener(ConversationDetailFragment.this);
+			((MultipartyConversation)conversation).addBuddyListener(ConversationFragment.this);
 
 		updateTitle();
 	}
@@ -114,7 +113,7 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 	public void onPause()
 	{
 		super.onPause();
-		conversation.removeMessageListener(ConversationDetailFragment.this);
+		conversation.removeMessageListener(ConversationFragment.this);
 	}
 
 	@Override
@@ -237,22 +236,22 @@ public class ConversationDetailFragment extends BoundFragment implements Cryptoc
 						break;
 					case Join:
 						txt = item.nickname + " joined";
-						background = R.drawable.bubble_notif;
+						background = R.drawable.bubble_join;
 						gravity = Gravity.CENTER;
 						break;
                     case Leave:
                         txt = item.nickname + " left";
-                        background = R.drawable.bubble_notif;
+                        background = R.drawable.bubble_leave;
                         gravity = Gravity.CENTER;
                         break;
                     case File:
                         txt = item.nickname + " sent a file";
-                        background = R.drawable.bubble_notif;
+                        background = R.drawable.bubble_join;
                         gravity = Gravity.CENTER;
                         break;
                     case Error:
-                        txt = "ERROR: "+item.text;
-                        background = R.drawable.bubble_notif;
+                        txt = item.text;
+                        background = R.drawable.bubble_error;
                         gravity = Gravity.CENTER;
                         break;
 					default:

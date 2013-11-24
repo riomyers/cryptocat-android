@@ -9,17 +9,19 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import net.dirbaio.cryptocat.service.CryptocatService;
 
-public class BoundFragment extends SherlockFragment
+/**
+ * Base Fragment class used throughout the app. Adds useful methods to communicate with the activity and service.
+ */
+public class BaseFragment extends SherlockFragment
 {
 	//=============
 	// Callback stuff
-
 
 	/**
 	 * The fragment's current callback object, which is notified of list item
 	 * clicks.
 	 */
-	protected Callbacks callbacks = sDummyCallbacks;
+	protected Callbacks callbacks = dummyCallbacks;
 
 	@Override
 	public void onAttach(Activity activity)
@@ -28,9 +30,7 @@ public class BoundFragment extends SherlockFragment
 
 		// Activities containing this fragment must implement its callbacks.
 		if (!(activity instanceof Callbacks))
-		{
 			throw new IllegalStateException("Activity must implement fragment's callbacks.");
-		}
 
 		callbacks = (Callbacks) activity;
 	}
@@ -41,7 +41,7 @@ public class BoundFragment extends SherlockFragment
 		super.onDetach();
 
 		// Reset the active callbacks interface to the dummy implementation.
-		callbacks = sDummyCallbacks;
+		callbacks = dummyCallbacks;
 	}
 
 	protected CryptocatService getService()
@@ -71,7 +71,7 @@ public class BoundFragment extends SherlockFragment
 	 * A dummy implementation of the {@link Callbacks} interface that does
 	 * nothing. Used only when this fragment is not attached to an activity.
 	 */
-	private static Callbacks sDummyCallbacks = new Callbacks()
+	private static Callbacks dummyCallbacks = new Callbacks()
 	{
 		@Override
 		public void onItemSelected(String server, String conversation, String buddy)
@@ -120,6 +120,10 @@ public class BoundFragment extends SherlockFragment
 	{
 
 	}
+
+    // Alternate Context
+    // (Used to make the side fragments have the dark theme
+    //================
 
 	private Context altContext;
 	protected Context getAltContext()

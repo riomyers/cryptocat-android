@@ -15,7 +15,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import net.dirbaio.cryptocat.service.CryptocatService;
 
-public class MainActivity extends SherlockFragmentActivity implements BoundFragment.Callbacks, SlidingMenu.OnOpenListener, SlidingMenu.OnCloseListener
+public class MainActivity extends SherlockFragmentActivity implements BaseFragment.Callbacks, SlidingMenu.OnOpenListener, SlidingMenu.OnCloseListener
 {
 
 	public static final String ARG_SERVER_ID = "net.dirbaio.cryptocat.SERVER_ID";
@@ -29,8 +29,8 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 
 	private SlidingMenu sm;
 
-	public BoundFragment currCenterFragment;
-	public BoundFragment currRightFragment;
+	public BaseFragment currCenterFragment;
+	public BaseFragment currRightFragment;
 	private ConversationListFragment conversationList;
 	private String selectedServer, selectedConversation, selectedBuddy;
 
@@ -134,18 +134,18 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 	}
 
 
-    private void setLeftFragment(BoundFragment fragment)
+    private void setLeftFragment(BaseFragment fragment)
     {
         setFragment(R.id.conversation_list_container, fragment);
     }
 
-    private void setCenterFragment(BoundFragment fragment)
+    private void setCenterFragment(BaseFragment fragment)
 	{
         currCenterFragment = fragment;
 		setFragment(R.id.conversation_detail_container, fragment);
 	}
 
-	private void setRightFragment(BoundFragment fragment)
+	private void setRightFragment(BaseFragment fragment)
 	{
         currRightFragment = fragment;
 		setFragment(R.id.buddy_list_container, fragment);
@@ -207,12 +207,12 @@ public class MainActivity extends SherlockFragmentActivity implements BoundFragm
 		arguments.putString(ARG_CONVERSATION_ID, conversation);
 		arguments.putString(ARG_BUDDY_ID, buddy);
 
-		BoundFragment centerFragment;
-		BoundFragment rightFragment;
+		BaseFragment centerFragment;
+		BaseFragment rightFragment;
 
 		if (server != null && conversation != null)
 		{
-			centerFragment = new ConversationDetailFragment();
+			centerFragment = new ConversationFragment();
 			rightFragment = new ConversationListFragment();
 		}
 		else

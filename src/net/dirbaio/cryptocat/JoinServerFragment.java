@@ -9,7 +9,7 @@ import android.widget.EditText;
 import net.dirbaio.cryptocat.service.CryptocatServer;
 import net.dirbaio.cryptocat.service.CryptocatServerConfig;
 
-public class JoinServerFragment extends BoundFragment
+public class JoinServerFragment extends BaseFragment
 {
 
 	private View rootView;

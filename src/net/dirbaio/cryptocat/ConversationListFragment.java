@@ -23,12 +23,12 @@ import java.util.ArrayList;
  * A list fragment representing a list of Conversations. This fragment
  * also supports tablet devices by allowing list items to be given an
  * 'activated' state upon selection. This helps indicate which item is
- * currently being viewed in a {@link ConversationDetailFragment}.
+ * currently being viewed in a {@link ConversationFragment}.
  * <p/>
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class ConversationListFragment extends BoundListFragment implements CryptocatStateListener
+public class ConversationListFragment extends BaseListFragment implements CryptocatStateListener
 {
 
 	/**

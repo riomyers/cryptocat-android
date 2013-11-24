@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class CreditsFragment extends BoundFragment
+public class CreditsFragment extends BaseFragment
 {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

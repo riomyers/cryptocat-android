@@ -27,7 +27,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.*;
 
 /**
- * Version of ListFragment that inherits from BoundFragment, so we can have the nice things from both!
+ * Version of ListFragment that inherits from BaseFragment, so we can have the nice things from both!
  * <p/>
  * Static library support version of the framework's {@link android.app.ListFragment}.
  * Used to write apps that run on platforms prior to Android 3.0.  When running
@@ -35,7 +35,7 @@ import android.widget.*;
  * to switch to the framework's implementation.  See the framework SDK
  * documentation for a class overview.
  */
-public class BoundListFragment extends BoundFragment
+public class BaseListFragment extends BaseFragment
 {
 	static final int INTERNAL_EMPTY_ID = 0x00ff0001;
 	static final int INTERNAL_PROGRESS_CONTAINER_ID = 0x00ff0002;
@@ -69,7 +69,7 @@ public class BoundListFragment extends BoundFragment
 	CharSequence mEmptyText;
 	boolean mListShown;
 
-	public BoundListFragment()
+	public BaseListFragment()
 	{
 	}
 

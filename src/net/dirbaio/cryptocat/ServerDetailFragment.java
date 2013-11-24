@@ -12,7 +12,7 @@ import net.dirbaio.cryptocat.service.CryptocatStateListener;
 import net.dirbaio.cryptocat.service.MultipartyConversation;
 import org.jivesoftware.smack.XMPPException;
 
-public class ServerDetailFragment extends BoundFragment implements CryptocatStateListener
+public class ServerDetailFragment extends BaseFragment implements CryptocatStateListener
 {
 
 	private String serverId;
