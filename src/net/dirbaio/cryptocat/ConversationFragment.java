@@ -24,7 +24,6 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 	private String buddyId;
 	private Conversation conversation;
 
-	private ArrayAdapter<CryptocatMessage> conversationArrayAdapter;
 	private ConversationListView conversationView;
 	private View rootView;
 	private ImageButton sendButton;
@@ -99,8 +98,7 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 		if(buddyId != null)
 			conversation = ((MultipartyConversation)conversation).getPrivateConversation(buddyId);
 
-		conversationArrayAdapter = new ConversationAdapter(getActivity(), conversation.history);
-		conversationView.setAdapter(conversationArrayAdapter);
+        conversationView.setHistory(conversation.history);
 
 		conversation.addMessageListener(ConversationFragment.this);
 		if(conversation instanceof MultipartyConversation)
@@ -119,7 +117,7 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 	@Override
 	public void messageReceived(final CryptocatMessage message)
 	{
-		conversationArrayAdapter.notifyDataSetChanged();
+		conversationView.notifyDataSetChanged();
 	}
 
 	@Override
@@ -128,7 +126,6 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 		rootView = inflater.inflate(R.layout.fragment_conversation, container, false);
 
 		conversationView = (ConversationListView) rootView.findViewById(R.id.conversation);
-		conversationView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
 		sendButton = (ImageButton) rootView.findViewById(R.id.send);
 		text = (EditText) rootView.findViewById(R.id.text);
@@ -179,77 +176,6 @@ public class ConversationFragment extends BaseFragment implements CryptocatMessa
 		updateTitle();
 	}
 
-	private class ConversationAdapter extends ArrayAdapter<CryptocatMessage>
-	{
-
-		private Context context;
-
-		public ConversationAdapter(Context context, ArrayList<CryptocatMessage> items)
-		{
-			super(context, 0, items);
-			this.context = context;
-		}
-
-        @Override
-        public int getViewTypeCount() {
-            return CryptocatMessage.Type.values().length;
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            return getItem(position).type.ordinal();
-        }
-
-        public View getView(int position, View view, ViewGroup parent)
-		{
-            CryptocatMessage msg = getItem(position);
-
-			if (view == null)
-			{
-				LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                int id;
-
-                switch (msg.type)
-                {
-                    case Message:       id = R.layout.message; break;
-                    case MessageMine:   id = R.layout.message_mine; break;
-                    case Join:          id = R.layout.message_join; break;
-                    case Leave:         id = R.layout.message_leave; break;
-                    case File:          id = R.layout.message_error; break;
-                    case Error:         id = R.layout.message_error; break;
-                    default: throw new IllegalStateException("Unknown item type");
-                }
-
-                view = inflater.inflate(id, null);
-			}
-
-            boolean showNick = true;
-
-            if(msg.type == CryptocatMessage.Type.Message && position != 0)
-            {
-                CryptocatMessage prevMsg = getItem(position-1);
-                if(prevMsg.type == CryptocatMessage.Type.Message && prevMsg.nickname.equals(msg.nickname))
-                    showNick = false;
-            }
-
-            if(msg.type != CryptocatMessage.Type.Error && msg.type != CryptocatMessage.Type.MessageMine)
-            {
-                TextView nickView = (TextView) view.findViewById(R.id.nickname);
-                nickView.setVisibility(showNick?View.VISIBLE:View.GONE);
-                nickView.setText(msg.nickname);
-            }
-
-            if(msg.type != CryptocatMessage.Type.Join && msg.type != CryptocatMessage.Type.Leave)
-            {
-                TextView textView = (TextView) view.findViewById(R.id.text);
-                textView.setText(msg.text);
-            }
-
-
-			return view;
-		}
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
