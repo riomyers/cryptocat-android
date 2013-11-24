@@ -1,12 +1,5 @@
 package net.dirbaio.cryptocat.service;
 
-/**
- * Created with IntelliJ IDEA.
- * User: dirbaio
- * Date: 8/17/13
- * Time: 6:16 AM
- * To change this template use File | Settings | File Templates.
- */
 public class CryptocatMessage
 {
 	public final Type t;

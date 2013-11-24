@@ -53,13 +53,12 @@ public class MultipartyConversation extends Conversation
 	{
 		Utils.assertUiThread();
 
-		if (state != State.Left)
+		if (getState() != State.Left)
 			throw new IllegalStateException("You're already joined.");
 		if (server.getState() != CryptocatServer.State.Connected)
 			throw new IllegalStateException("Server is not connected");
 
-		state = State.Joining;
-		server.notifyStateChanged();
+		setState(State.Joining);
 
 		//Random cleaning
 		buddiesByName.clear();
@@ -154,15 +153,13 @@ public class MultipartyConversation extends Conversation
 
 					muc.join(nickname, "", history, SmackConfiguration.getPacketReplyTimeout());
 
-					state = State.Joined;
-					server.notifyStateChanged();
+					setState(State.Joined);
 				}
 				catch (Exception e)
 				{
 					e.printStackTrace();
 
-					state = State.Error;
-					server.notifyStateChanged();
+                    setState(State.Error);
 				}
 			}
 		});
@@ -172,7 +169,7 @@ public class MultipartyConversation extends Conversation
 	{
 		Utils.assertUiThread();
 
-		if (state != State.Joined)
+		if (getState() != State.Joined)
 			throw new IllegalStateException("You have not joined.");
 
 		for(Buddy b : buddies)
@@ -194,8 +191,7 @@ public class MultipartyConversation extends Conversation
 		publicKey = null;
 		buddiesByName.clear();
 
-		state = State.Left;
-		server.notifyStateChanged();
+        setState(State.Left);
 	}
 
 	public void addBuddyListener(CryptocatBuddyListener l)
@@ -218,7 +214,7 @@ public class MultipartyConversation extends Conversation
 	@Override
 	public String toString()
 	{
-		return "[" + state + "] " + roomName;
+		return "[" + getState() + "] " + roomName;
 	}
 
 	private void sendJsonMessage(JsonMessage m)
@@ -361,7 +357,7 @@ public class MultipartyConversation extends Conversation
 		Utils.assertUiThread();
 
 		//Check state
-		if (state != State.Joined)
+		if (getState() != State.Joined)
 			throw new IllegalStateException("You have not joined.");
 
 		// Append 64 random bytes to the string.
@@ -540,7 +536,7 @@ public class MultipartyConversation extends Conversation
 
 
 		private void startPrivateConversation() throws XMPPException {
-			if (state != State.Joined)
+			if (getState() != State.Joined)
 				throw new IllegalStateException("You're not joined to the chatroom.");
 			if (server.getState() == CryptocatServer.State.Disconnected)
 				throw new IllegalStateException("Server is not connected");

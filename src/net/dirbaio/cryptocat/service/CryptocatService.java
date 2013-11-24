@@ -14,9 +14,6 @@ import net.dirbaio.cryptocat.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by dirbaio on 8/16/13.
- */
 public class CryptocatService extends Service implements CryptocatStateListener
 {
 

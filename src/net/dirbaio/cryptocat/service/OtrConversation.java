@@ -23,7 +23,6 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
     private SessionID otrSessionID;
     private OtrEngine otrEngine;
 
-
 	public OtrConversation(MultipartyConversation parent, String buddyNickname) throws XMPPException
 	{
 		super(parent.server, parent.nickname);
@@ -35,14 +34,14 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
 	@Override
 	public void join()
 	{
-		if (state != State.Left)
+		if (getState() != State.Left)
 			throw new IllegalStateException("You're already joined.");
 		if (server.getState() != CryptocatServer.State.Connected)
 			throw new IllegalStateException("Server is not connected");
 		if (parent.getState() != State.Joined)
 			throw new IllegalStateException("You haven't joined the chatroom");
 
-		state = State.Joining;
+        setState(State.Joining);
 
         otrPolicy = new OtrPolicyImpl(OtrPolicy.ALLOW_V2 | OtrPolicy.ERROR_START_AKE | OtrPolicy.REQUIRE_ENCRYPTION);
         otrSessionID = new SessionID("", "", "");
@@ -58,16 +57,14 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
 					server.notifyStateChanged();
 					chat = parent.muc.createPrivateChat(parent.roomName +"@"+parent.server.config.conferenceServer+"/"+buddyNickname, OtrConversation.this);
 
-					state = State.Joined;
+                    setState(State.Joined);
                     otrEngine.startSession(otrSessionID);
-					server.notifyStateChanged();
 				}
 				catch(Exception e)
 				{
 					e.printStackTrace();
 
-					state = State.Error;
-					server.notifyStateChanged();
+                    setState(State.Error);
 				}
 			}
 		});
@@ -76,7 +73,7 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
 	@Override
 	public void leave()
 	{
-		if (state == State.Left)
+		if (getState() == State.Left)
 			throw new IllegalStateException("You have not joined.");
 
 		final Chat chatFinal = chat;
@@ -91,8 +88,7 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
 
 		chat = null;
 
-		state = State.Left;
-		server.notifyStateChanged();
+        setState(State.Left);
 	}
 
 	@Override
@@ -130,7 +126,7 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
 	@Override
 	public String toString()
 	{
-		return "[" + state + "] " + parent.roomName +":"+buddyNickname;
+		return "[" + getState() + "] " + parent.roomName +":"+buddyNickname;
 	}
 
     private void sendRawMessage(final String msg)

@@ -22,7 +22,8 @@ public abstract class Conversation
 	public String id;
 	public final ArrayList<CryptocatMessage> history = new ArrayList<>();
 
-	protected State state;
+	private State state;
+    private int unread;
 
 	public enum State
 	{
@@ -41,11 +42,24 @@ public abstract class Conversation
 		this.state = State.Left;
 	}
 
+    protected final void setState(State newState)
+    {
+        if(state == newState) return;
+
+        state = newState;
+        server.notifyStateChanged();
+    }
+
 	public final State getState()
 	{
 		Utils.assertUiThread();
 		return state;
 	}
+
+    public final int getUnreadCount()
+    {
+        return unread;
+    }
 
 	public abstract void join();
 	public abstract void leave();
@@ -55,6 +69,13 @@ public abstract class Conversation
 	{
 		Utils.assertUiThread();
 		msgListeners.add(l);
+
+        if(unread != 0)
+        {
+            unread = 0;
+            server.notifyStateChanged();
+        }
+
 	}
 
 	public final void removeMessageListener(CryptocatMessageListener l)
@@ -68,6 +89,12 @@ public abstract class Conversation
 		Utils.assertUiThread();
 
 		history.add(msg);
+
+        if(msgListeners.size() == 0)
+        {
+            unread++;
+            server.notifyStateChanged();
+        }
 
 		for (CryptocatMessageListener l : msgListeners)
 			l.messageReceived(msg);
