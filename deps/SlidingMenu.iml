@@ -22,7 +22,7 @@
     <content url="file://$MODULE_DIR$/repo/library/gen">
       <sourceFolder url="file://$MODULE_DIR$/repo/library/gen" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Android 4.3 Platform" jdkType="Android SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="android-support-v42" level="project" />
   </component>
