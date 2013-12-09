@@ -110,7 +110,7 @@ public class CryptocatServer
 				path = System.getProperty("java.home") + File.separator + "etc"
 						+ File.separator + "security" + File.separator
 						+ "cacerts.bks";
-			System.err.println("Trust path: " + path);
+
 			conConfig.setTruststorePath(path);
 		}
 
