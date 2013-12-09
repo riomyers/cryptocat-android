@@ -114,6 +114,12 @@ public class CryptocatServer
 			conConfig.setTruststorePath(path);
 		}
 
+        //Require TLS to connect to the server.
+        conConfig.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
+
+        //Don't allow self signed certificates.
+        conConfig.setSelfSignedCertificateEnabled(false);
+
 		final ConnectionConfiguration conConfigFinal = conConfig;
 
 		CryptocatService.getInstance().post(new ExceptionRunnable()
