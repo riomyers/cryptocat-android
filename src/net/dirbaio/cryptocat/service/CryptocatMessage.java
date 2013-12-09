@@ -6,6 +6,10 @@ public class CryptocatMessage
 	public final String nickname;
 	public final String text;
 
+    //Used for collapsing bubbles when rendering.
+    public int left, right = -1;
+    public int screenWidth = -1;
+
 	public CryptocatMessage(String nickname, Type type)
 	{
 		this.nickname = nickname;

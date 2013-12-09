@@ -474,7 +474,6 @@ public class MultipartyConversation extends Conversation
         }
 
         public void setPublicKey(byte[] publicKey) throws NoSuchProviderException, NoSuchAlgorithmException, XMPPException {
-            System.err.println("Received pubkey from "+nickname);
             this.publicKey = publicKey;
 
             //Gen shared secret

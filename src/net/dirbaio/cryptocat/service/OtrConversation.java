@@ -1,5 +1,6 @@
 package net.dirbaio.cryptocat.service;
 
+import android.util.Log;
 import net.dirbaio.cryptocat.ExceptionRunnable;
 import net.java.otr4j.*;
 import net.java.otr4j.session.SessionID;
@@ -116,7 +117,6 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
             public void run() throws Exception {
                 String txt = message.getBody();
                 String plaintext = otrEngine.transformReceiving(otrSessionID, txt);
-                System.err.println("Type: "+message.getType().toString()+": "+txt+ " = "+plaintext);
                 if (plaintext != null)
                     addMessage(new CryptocatMessage(CryptocatMessage.Type.Message, buddyNickname, plaintext));
             }
@@ -148,12 +148,12 @@ public class OtrConversation extends Conversation implements MessageListener, Ot
 
     @Override
     public void showWarning(SessionID sessionID, String s) {
-        System.err.println("OTR WARNING: "+s);
+        Log.w("OTR", "OTR WARNING: " + s);
     }
 
     @Override
     public void showError(SessionID sessionID, String s) {
-        System.err.println("OTR ERROR: "+s);
+        Log.e("OTR", "OTR ERROR: " + s);
     }
 
     @Override

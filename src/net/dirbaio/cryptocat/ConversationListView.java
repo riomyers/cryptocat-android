@@ -1,9 +1,13 @@
 package net.dirbaio.cryptocat;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.NinePatchDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +52,7 @@ public class ConversationListView extends ListView
 
     //Trick to make the code below simpler.
     public static final CryptocatMessage dummyMessage = new CryptocatMessage(CryptocatMessage.Type.Error, "dummy", "dummy");
+    private static Rect rect = new Rect();
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -59,6 +64,7 @@ public class ConversationListView extends ListView
         final int count = getChildCount();
 
         boolean inGroup = false;
+        int groupStart = 0;
         String groupNick = "";
         int left = 0, top = 0, right = 0, bottom = 0;
 
@@ -88,8 +94,35 @@ public class ConversationListView extends ListView
                 {
                     //Group has been broken
 //                    canvas.drawRect(vg.getLeft()+v.getLeft(), vg.getTop()+v.getTop(), vg.getLeft()+v.getRight(), vg.getTop()+v.getBottom(), paint);
-                    canvas.drawRect(left, top, right, bottom, paint);
+
+                    //Choose drawable
+                    NinePatchDrawable bubble;
+                    if(msg.type == CryptocatMessage.Type.MessageMine)
+                        bubble = (NinePatchDrawable) getResources().getDrawable(R.drawable.bubble);
+                    else
+                        bubble = (NinePatchDrawable) getResources().getDrawable(R.drawable.bubble_rev);
+
+                    bubble.getPadding(rect);
+                    //Set bounds on drawable
+                    bubble.setBounds(left-rect.left, top-rect.top, right+rect.right, bottom+rect.bottom);
+
+                    //Draw it!
+                    bubble.draw(canvas);
+
+                    //Exit bubble group and save coordinates
                     inGroup = false;
+                    for(int j = groupStart; j < i; j++)
+                    {
+                        ViewGroup vg2 = (ViewGroup) getChildAt(j);
+                        ViewHolder holder2 = (ViewHolder)vg2.getTag();
+                        if(holder2 == null)
+                            continue;
+
+                        CryptocatMessage msg2 = holder2.message;
+                        msg2.screenWidth = getWidth();
+                        msg2.left = left;
+                        msg2.right = right;
+                    }
                 }
                 else
                 {
@@ -98,6 +131,11 @@ public class ConversationListView extends ListView
                     top = min(top, vg.getTop()+v.getTop());
                     right = max(right, vg.getLeft()+v.getRight());
                     bottom = max(bottom, vg.getTop()+v.getBottom());
+                    if(msg.screenWidth == getWidth())
+                    {
+                        left = min(left, msg.left);
+                        right = max(right, msg.right);
+                    }
                 }
             }
 
@@ -105,6 +143,7 @@ public class ConversationListView extends ListView
             if(!inGroup && (msg.type == CryptocatMessage.Type.Message || msg.type == CryptocatMessage.Type.MessageMine))
             {
                 inGroup = true;
+                groupStart = i;
                 groupNick = msg.nickname;
 
                 left = vg.getLeft()+v.getLeft();

@@ -235,7 +235,6 @@ public class ConversationListFragment extends BaseListFragment implements Crypto
 
 			Object item = getItem(position);
 			TextView textView = (TextView) view.findViewById(R.id.text);
-            System.err.println("GetView "+conversation+" "+item);
             String str = item.toString();
             textView.setText(str);
 
