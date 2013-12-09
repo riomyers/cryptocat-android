@@ -42,6 +42,9 @@ public class MainActivity extends SherlockFragmentActivity implements BaseFragme
 	{
 		super.onCreate(savedInstanceState);
 
+        //Apply PRNG fixes
+        PRNGFixes.apply();
+
 		//Start the service if it isn't already started.
 		startService(new Intent(this, CryptocatService.class));
 
