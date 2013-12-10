@@ -6,9 +6,9 @@
 	android:layout_height="wrap_content"
 	android:baselineAligned="false"
 	android:id="@+id/bubble_parent"
-	android:paddingLeft="16dp"
+	android:paddingLeft="6dp"
 	android:paddingTop="3dp"
-	android:paddingRight="60dp"
+	android:paddingRight="50dp"
 	android:paddingBottom="3dp">
 
 	<LinearLayout
@@ -21,19 +21,35 @@
 		android:layout_weight="0.0"
 		android:gravity="right"
 		android:layout_gravity="left|center_vertical"
-		android:layout_marginRight="25dp">
+		>
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/nickname"
 			android:layout_gravity="center|left"
-			android:textStyle="bold"/>
+			android:textStyle="bold"
+			android:textColor="#ffffff"
+			android:minWidth="70dp"
+			android:textAlignment="center"
+			android:background="#93cfeb"
+			android:layout_marginTop="3dp"
+			android:layout_marginLeft="2dp"
+			android:text="nick"
+			android:singleLine="false"
+			android:paddingLeft="8dp"
+			android:paddingTop="2dp"
+			android:paddingRight="8dp"
+			android:paddingBottom="2dp"
+			android:layout_marginBottom="4dp"
+			android:autoText="false"/>
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/text"
-			android:layout_gravity="center|left"/>
+			android:layout_gravity="center|left"
+			android:layout_marginLeft="10dp"
+			android:text="text"/>
 	</LinearLayout>
 </FrameLayout>

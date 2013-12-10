@@ -6,9 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +52,15 @@ public class ConversationListView extends ListView
 
     //Trick to make the code below simpler.
     public static final CryptocatMessage dummyMessage = new CryptocatMessage(CryptocatMessage.Type.Error, "dummy", "dummy");
-    private static Rect rect = new Rect();
+    private static Rect tempRect = new Rect();
+    private static Rect bubbleRect = new Rect();
+    private static Rect thisRect = new Rect();
+
+    private int dpToPixels(int dp)
+    {
+        Resources r = getResources();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -65,36 +73,52 @@ public class ConversationListView extends ListView
 
         boolean inGroup = false;
         int groupStart = 0;
-        String groupNick = "";
-        int left = 0, top = 0, right = 0, bottom = 0;
 
-        for(int i = 0; i <= count; i++)
+        for(int i = 0; i < count; i++)
         {
             CryptocatMessage msg = dummyMessage;
-            View v = null;
-            ViewGroup vg = null;
 
-            if(i != count)
+            //Every message_* layout is a LinearLayout to align something to the left/center/right
+            //We're interested in the position of its child, so we get it this way.
+            ViewGroup vg = (ViewGroup) getChildAt(i);
+            ViewHolder holder = (ViewHolder)vg.getTag();
+            if(holder == null)
+                continue;
+
+            msg = holder.message;
+            View v = vg.getChildAt(0);
+
+            //See if new group starts
+            if(!inGroup && (msg.type == CryptocatMessage.Type.Message || msg.type == CryptocatMessage.Type.MessageMine))
             {
-                //Every message_* layout is a LinearLayout to align something to the left/center/right
-                //We're interested in the position of its child, so we get it this way.
-                vg = (ViewGroup) getChildAt(i);
-                ViewHolder holder = (ViewHolder)vg.getTag();
-                if(holder == null)
-                    continue;
+                inGroup = true;
+                groupStart = i;
 
-                msg = holder.message;
-                v = vg.getChildAt(0);
+                bubbleRect.set(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
             }
 
-            //See if one group ends
             if(inGroup)
             {
-                if((msg.type != CryptocatMessage.Type.Message && msg.type != CryptocatMessage.Type.MessageMine) || !msg.nickname.equals(groupNick))
-                {
-                    //Group has been broken
-//                    canvas.drawRect(vg.getLeft()+v.getLeft(), vg.getTop()+v.getTop(), vg.getLeft()+v.getRight(), vg.getTop()+v.getBottom(), paint);
+                //group continues
+                thisRect.set(vg.getLeft()+v.getLeft(), vg.getTop()+v.getTop(), vg.getLeft()+v.getRight(), vg.getTop()+v.getBottom());
 
+                if(msg.screenWidth == getWidth())
+                {
+                    thisRect.left = min(thisRect.left, msg.left);
+                    thisRect.right = max(thisRect.right, msg.right);
+                }
+
+                if(msg.firstInGroup && msg.type == CryptocatMessage.Type.Message)
+                    thisRect.top += dpToPixels(10);
+
+                if(msg.type == CryptocatMessage.Type.Message)
+                    thisRect.left += dpToPixels(10);
+
+                bubbleRect.union(thisRect);
+
+                //Group ends
+                if(msg.lastInGroup || i == count-1)
+                {
                     //Choose drawable
                     NinePatchDrawable bubble;
                     if(msg.type == CryptocatMessage.Type.MessageMine)
@@ -102,16 +126,17 @@ public class ConversationListView extends ListView
                     else
                         bubble = (NinePatchDrawable) getResources().getDrawable(R.drawable.bubble_rev);
 
-                    bubble.getPadding(rect);
+                    bubble.getPadding(tempRect);
+
                     //Set bounds on drawable
-                    bubble.setBounds(left-rect.left, top-rect.top, right+rect.right, bottom+rect.bottom);
+                    bubble.setBounds(bubbleRect.left - tempRect.left, bubbleRect.top - tempRect.top, bubbleRect.right + tempRect.right, bubbleRect.bottom + tempRect.bottom);
 
                     //Draw it!
                     bubble.draw(canvas);
 
                     //Exit bubble group and save coordinates
                     inGroup = false;
-                    for(int j = groupStart; j < i; j++)
+                    for(int j = groupStart; j <= i; j++)
                     {
                         ViewGroup vg2 = (ViewGroup) getChildAt(j);
                         ViewHolder holder2 = (ViewHolder)vg2.getTag();
@@ -120,36 +145,10 @@ public class ConversationListView extends ListView
 
                         CryptocatMessage msg2 = holder2.message;
                         msg2.screenWidth = getWidth();
-                        msg2.left = left;
-                        msg2.right = right;
+                        msg2.left = bubbleRect.left;
+                        msg2.right = bubbleRect.right;
                     }
                 }
-                else
-                {
-                    //group continues
-                    left = min(left, vg.getLeft()+v.getLeft());
-                    top = min(top, vg.getTop()+v.getTop());
-                    right = max(right, vg.getLeft()+v.getRight());
-                    bottom = max(bottom, vg.getTop()+v.getBottom());
-                    if(msg.screenWidth == getWidth())
-                    {
-                        left = min(left, msg.left);
-                        right = max(right, msg.right);
-                    }
-                }
-            }
-
-            //See if new group starts
-            if(!inGroup && (msg.type == CryptocatMessage.Type.Message || msg.type == CryptocatMessage.Type.MessageMine))
-            {
-                inGroup = true;
-                groupStart = i;
-                groupNick = msg.nickname;
-
-                left = vg.getLeft()+v.getLeft();
-                top = vg.getTop()+v.getTop();
-                right = vg.getLeft()+v.getRight();
-                bottom = vg.getTop()+v.getBottom();
             }
         }
     }
@@ -190,9 +189,32 @@ public class ConversationListView extends ListView
             return getItem(position).type.ordinal();
         }
 
+        private boolean sameGroup(CryptocatMessage a, CryptocatMessage b)
+        {
+            if(a.type != b.type)
+                return false;
+            if(a.type != CryptocatMessage.Type.Message && a.type != CryptocatMessage.Type.MessageMine)
+                return false;
+
+            return a.nickname.equals(b.nickname);
+        }
+
         public View getView(int position, View view, ViewGroup parent)
         {
             CryptocatMessage msg = getItem(position);
+
+            CryptocatMessage prevMsg = dummyMessage;
+            if(position > 0)
+                prevMsg = getItem(position-1);
+
+            CryptocatMessage nextMsg = dummyMessage;
+            if(position < getCount()-1)
+                nextMsg = getItem(position+1);
+
+            //Calculate message grouping
+            msg.firstInGroup = !sameGroup(msg, prevMsg);
+            msg.lastInGroup = !sameGroup(msg, nextMsg);
+
             ViewHolder holder;
 
             if (view == null)
@@ -228,27 +250,21 @@ public class ConversationListView extends ListView
 
             holder.message = msg;
 
-            boolean showNick = true;
-
-            if(msg.type == CryptocatMessage.Type.Message && position != 0)
+            if(holder.nickname != null)
             {
-                CryptocatMessage prevMsg = getItem(position-1);
-                if(prevMsg.type == CryptocatMessage.Type.Message && prevMsg.nickname.equals(msg.nickname))
-                    showNick = false;
-            }
-
-            if(msg.type != CryptocatMessage.Type.Error && msg.type != CryptocatMessage.Type.MessageMine)
-            {
-                holder.nickname.setVisibility(showNick ? View.VISIBLE : View.GONE);
+                holder.nickname.setVisibility(msg.firstInGroup ? View.VISIBLE : View.GONE);
                 holder.nickname.setText(msg.nickname);
             }
 
-            if(msg.type != CryptocatMessage.Type.Join && msg.type != CryptocatMessage.Type.Leave)
-            {
+            if(holder.text != null)
                 holder.text.setText(msg.text);
-            }
 
-
+            view.setPadding(
+                    view.getPaddingLeft(),
+                    msg.type == CryptocatMessage.Type.MessageMine && msg.firstInGroup ? dpToPixels(12) : dpToPixels(3),
+                    view.getPaddingRight(),
+                    (msg.type == CryptocatMessage.Type.MessageMine || msg.type == CryptocatMessage.Type.Message) && msg.lastInGroup ? dpToPixels(20) : dpToPixels(3)
+            );
             return view;
         }
     }

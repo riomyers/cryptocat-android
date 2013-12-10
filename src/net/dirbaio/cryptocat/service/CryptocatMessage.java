@@ -9,6 +9,8 @@ public class CryptocatMessage
     //Used for collapsing bubbles when rendering.
     public int left, right = -1;
     public int screenWidth = -1;
+    public boolean firstInGroup = false;
+    public boolean lastInGroup = false;
 
 	public CryptocatMessage(String nickname, Type type)
 	{

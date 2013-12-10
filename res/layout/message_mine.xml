@@ -21,13 +21,13 @@
 		android:layout_weight="0.0"
 		android:gravity="right"
 		android:layout_gravity="right|center_vertical"
-		android:layout_marginLeft="25dp">
+		>
 
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/text"
 			android:layout_gravity="center|left"
-			/>
+			android:text="text"/>
 	</LinearLayout>
 </FrameLayout>
